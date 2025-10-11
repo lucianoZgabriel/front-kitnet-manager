@@ -44,3 +44,11 @@ export interface ChangePasswordRequest {
 export interface ChangeRoleRequest {
   role: UserRole
 }
+
+// Generic API Response wrapper
+export interface ApiResponse<T = unknown> {
+  success: boolean
+  message?: string
+  error?: string
+  data: T | null
+}

@@ -84,11 +84,11 @@ Roadmap completo para desenvolvimento do frontend do Kitnet Manager, organizado 
 - [x] Criar auth service com todos os endpoints
 - [x] Criar AuthContext e useAuth hook
 - [x] Integrar providers no layout principal
-- [ ] Criar página de login (`app/(auth)/login/page.tsx`)
-- [ ] Implementar LoginForm com React Hook Form + Zod
-- [ ] Criar `useLogin` mutation (React Query)
-- [ ] Criar `useCurrentUser` query
-- [ ] Implementar logout UI
+- [x] Criar página de login (`app/(auth)/login/page.tsx`)
+- [x] Implementar LoginForm com React Hook Form + Zod
+- [x] Implementar logout funcional
+- [x] Dashboard temporário para testes
+- [x] Corrigir encoding UTF-8 e redirect issues
 
 #### Layout Principal
 - [ ] Criar layout group `(dashboard)`

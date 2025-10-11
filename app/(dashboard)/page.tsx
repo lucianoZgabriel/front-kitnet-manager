@@ -1,46 +1,16 @@
 'use client'
 
-import { useEffect } from 'react'
 import { useAuth } from '@/src/hooks/use-auth'
-import { Button } from '@/src/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/components/ui/card'
-import { useRouter } from 'next/navigation'
 
 export default function DashboardPage() {
-  const { user, logout, isAuthenticated, isLoading } = useAuth()
-  const router = useRouter()
-
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push('/login')
-    }
-  }, [isAuthenticated, isLoading, router])
-
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
-          <p className="text-muted-foreground mt-2">Carregando...</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (!isAuthenticated) {
-    return null
-  }
+  const { user } = useAuth()
 
   return (
-    <div className="container mx-auto space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">Bem-vindo ao Kitnet Manager</p>
-        </div>
-        <Button onClick={logout} variant="outline">
-          Sair
-        </Button>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <p className="text-muted-foreground">Bem-vindo ao Kitnet Manager</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -94,7 +64,7 @@ export default function DashboardPage() {
           <CardContent>
             <ul className="space-y-2 text-sm">
               <li>✅ Sistema de autenticação</li>
-              <li>⏳ Layout com sidebar</li>
+              <li>✅ Layout com sidebar</li>
               <li>⏳ Dashboard com métricas</li>
               <li>⏳ CRUD de unidades</li>
               <li>⏳ CRUD de inquilinos</li>

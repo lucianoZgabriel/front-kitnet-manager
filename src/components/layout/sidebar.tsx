@@ -17,16 +17,20 @@ export function Sidebar() {
     return item.roles.includes(user?.role || '')
   })
 
-  if (!sidebarOpen) return null
-
   return (
-    <aside className="bg-background fixed top-0 left-0 z-30 h-screen w-64 border-r transition-transform duration-200 ease-in-out lg:translate-x-0">
-      <div className="flex h-16 items-center border-b px-6">
+    <aside
+      className={cn(
+        'bg-background fixed top-0 left-0 z-30 h-screen border-r transition-all duration-300 ease-in-out',
+        sidebarOpen ? 'w-64' : 'w-20',
+        'hidden lg:block'
+      )}
+    >
+      <div className="flex h-16 items-center border-b px-4">
         <Link href="/dashboard" className="flex items-center space-x-2">
-          <div className="bg-primary text-primary-foreground flex h-8 w-8 items-center justify-center rounded-lg">
+          <div className="bg-primary text-primary-foreground flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg">
             <span className="text-lg font-bold">K</span>
           </div>
-          <span className="text-lg font-semibold">Kitnet Manager</span>
+          {sidebarOpen && <span className="text-lg font-semibold">Kitnet Manager</span>}
         </Link>
       </div>
 
@@ -40,15 +44,17 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                'flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                sidebarOpen ? 'space-x-3' : 'justify-center',
                 isActive
                   ? 'bg-primary text-primary-foreground'
                   : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                 item.disabled && 'pointer-events-none opacity-50'
               )}
+              title={!sidebarOpen ? item.title : undefined}
             >
-              <Icon className="h-5 w-5" />
-              <span>{item.title}</span>
+              <Icon className="h-5 w-5 flex-shrink-0" />
+              {sidebarOpen && <span>{item.title}</span>}
             </Link>
           )
         })}

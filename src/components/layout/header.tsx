@@ -16,7 +16,7 @@ import { useRouter } from 'next/navigation'
 
 export function Header() {
   const { user, logout } = useAuth()
-  const { toggleSidebar, sidebarOpen } = useUIStore()
+  const { toggleSidebar } = useUIStore()
   const router = useRouter()
 
   const handleLogout = () => {
@@ -27,15 +27,9 @@ export function Header() {
   return (
     <header className="bg-background sticky top-0 z-20 flex h-16 items-center justify-between border-b px-6">
       <div className="flex items-center space-x-4">
-        <Button variant="ghost" size="icon" onClick={toggleSidebar} className="lg:hidden">
+        <Button variant="ghost" size="icon" onClick={toggleSidebar}>
           <Menu className="h-5 w-5" />
         </Button>
-
-        {!sidebarOpen && (
-          <Button variant="ghost" size="icon" onClick={toggleSidebar} className="hidden lg:flex">
-            <Menu className="h-5 w-5" />
-          </Button>
-        )}
       </div>
 
       <div className="flex items-center space-x-4">

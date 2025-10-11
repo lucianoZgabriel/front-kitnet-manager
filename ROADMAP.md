@@ -69,7 +69,7 @@ Roadmap completo para desenvolvimento do frontend do Kitnet Manager, organizado 
 
 ---
 
-## Sprint 1: Authentication & Layout (Semana 2) 🚧
+## Sprint 1: Authentication & Layout (Semana 2) ✅
 
 ### Objetivos
 - Sistema de autenticação completo
@@ -91,40 +91,44 @@ Roadmap completo para desenvolvimento do frontend do Kitnet Manager, organizado 
 - [x] Corrigir encoding UTF-8 e redirect issues
 
 #### Layout Principal
-- [ ] Criar layout group `(dashboard)`
-- [ ] Implementar Header component
+- [x] Criar layout group `(dashboard)`
+- [x] Implementar Header component
   - Logo + título
   - User dropdown (perfil + logout)
-  - Breadcrumbs
-- [ ] Implementar Sidebar component
+  - Toggle de menu (mobile e desktop)
+- [x] Implementar Sidebar component
   - Navegação principal
   - Indicador de rota ativa
-  - Versão mobile (Sheet)
-- [ ] Criar MobileNav component
-- [ ] Implementar toggle de sidebar (Zustand)
+  - Collapsible (80px ↔ 256px)
+- [x] Criar MobileSidebar component
+  - Sheet drawer deslizante
+  - Navegação completa para mobile
+  - Auto-close ao navegar
+- [x] Implementar toggle de sidebar (Zustand)
 
 #### Proteção de Rotas
-- [ ] Middleware para verificar auth
-- [ ] Redirect para /login se não autenticado
-- [ ] Redirect para /dashboard se já autenticado (na página de login)
+- [x] Layout-level auth protection (redirect para /login se não autenticado)
+- [x] Redirect para /dashboard se já autenticado (na página de login)
+- [ ] Middleware para verificar auth (opcional - proteção adicional)
 
 #### Componentes Compartilhados
-- [ ] LoadingSpinner
-- [ ] EmptyState
-- [ ] ErrorMessage
-- [ ] ConfirmDialog
+- [x] LoadingSpinner (com LoadingPage variant)
+- [x] EmptyState (com ícone, ação e descrição)
+- [x] ErrorMessage (com ErrorPage variant e retry)
+- [x] ConfirmDialog (com variant destructive e loading state)
 
 ### Entregáveis
 ✅ Auth Store e API Client implementados
 ✅ AuthContext e useAuth hook criados
-⏳ Login funcional com JWT
-⏳ Layout principal responsivo
-⏳ Navegação entre páginas
-⏳ Proteção de rotas implementada
+✅ Login funcional com JWT
+✅ Layout principal responsivo (desktop + mobile)
+✅ Navegação entre páginas (sidebar + mobile drawer)
+✅ Proteção de rotas implementada
+✅ Componentes compartilhados (LoadingSpinner, EmptyState, ErrorMessage, ConfirmDialog)
 
-**Em progresso desde:** 11/01/2025
+**Concluído em:** 11/01/2025
 **Branch:** feature/sprint1-authentication
-**Último commit:** 09886ad
+**Commits:** 573ca53 → current
 
 ---
 

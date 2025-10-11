@@ -1,16 +1,33 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useAuth } from '@/src/hooks/use-auth'
 import { Button } from '@/src/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/components/ui/card'
 import { useRouter } from 'next/navigation'
 
 export default function DashboardPage() {
-  const { user, logout, isAuthenticated } = useAuth()
+  const { user, logout, isAuthenticated, isLoading } = useAuth()
   const router = useRouter()
 
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push('/login')
+    }
+  }, [isAuthenticated, isLoading, router])
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
+          <p className="text-muted-foreground mt-2">Carregando...</p>
+        </div>
+      </div>
+    )
+  }
+
   if (!isAuthenticated) {
-    router.push('/login')
     return null
   }
 

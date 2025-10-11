@@ -14,7 +14,11 @@ import { useAuth } from '@/src/hooks/use-auth'
 import { useUIStore } from '@/src/lib/stores/ui-store'
 import { useRouter } from 'next/navigation'
 
-export function Header() {
+interface HeaderProps {
+  onMobileMenuOpen?: () => void
+}
+
+export function Header({ onMobileMenuOpen }: HeaderProps) {
   const { user, logout } = useAuth()
   const { toggleSidebar } = useUIStore()
   const router = useRouter()
@@ -27,7 +31,13 @@ export function Header() {
   return (
     <header className="bg-background sticky top-0 z-20 flex h-16 items-center justify-between border-b px-6">
       <div className="flex items-center space-x-4">
-        <Button variant="ghost" size="icon" onClick={toggleSidebar}>
+        {/* Mobile menu button */}
+        <Button variant="ghost" size="icon" onClick={onMobileMenuOpen} className="lg:hidden">
+          <Menu className="h-5 w-5" />
+        </Button>
+
+        {/* Desktop sidebar toggle */}
+        <Button variant="ghost" size="icon" onClick={toggleSidebar} className="hidden lg:flex">
           <Menu className="h-5 w-5" />
         </Button>
       </div>

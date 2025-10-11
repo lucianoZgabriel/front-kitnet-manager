@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/src/hooks/use-auth'
 import { Sidebar } from '@/src/components/layout/sidebar'
+import { MobileSidebar } from '@/src/components/layout/mobile-sidebar'
 import { Header } from '@/src/components/layout/header'
 import { useUIStore } from '@/src/lib/stores/ui-store'
 
@@ -11,6 +12,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { isAuthenticated, isLoading } = useAuth()
   const { sidebarOpen } = useUIStore()
   const router = useRouter()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -36,12 +38,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="bg-background flex min-h-screen">
       <Sidebar />
+      <MobileSidebar open={mobileMenuOpen} onOpenChange={setMobileMenuOpen} />
       <div
         className={`flex flex-1 flex-col transition-all duration-300 ${
           sidebarOpen ? 'lg:ml-64' : 'lg:ml-20'
         }`}
       >
-        <Header />
+        <Header onMobileMenuOpen={() => setMobileMenuOpen(true)} />
         <main className="flex-1 p-6">{children}</main>
       </div>
     </div>

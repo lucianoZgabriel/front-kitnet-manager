@@ -1,6 +1,6 @@
 /**
- * Re-exportando o hook useAuth do contexto de autenticaÁ„o
- * Isso permite importar de um local mais sem‚ntico:
+ * Re-exportando o hook useAuth do contexto de autentica√ß√£o
+ * Isso permite importar de um local mais sem√¢ntico:
  * import { useAuth } from '@/src/hooks/use-auth'
  */
 

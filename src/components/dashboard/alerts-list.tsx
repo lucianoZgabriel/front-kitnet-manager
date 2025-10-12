@@ -32,7 +32,10 @@ const typeIcons = {
 }
 
 export function AlertsList({ alerts }: AlertsListProps) {
-  if (alerts.length === 0) {
+  // Garantir que alerts é um array
+  const alertsArray = Array.isArray(alerts) ? alerts : []
+
+  if (alertsArray.length === 0) {
     return (
       <Card>
         <CardHeader>
@@ -52,7 +55,7 @@ export function AlertsList({ alerts }: AlertsListProps) {
   }
 
   // Ordenar por severidade (high > medium > low)
-  const sortedAlerts = [...alerts].sort((a, b) => {
+  const sortedAlerts = [...alertsArray].sort((a, b) => {
     const severityOrder = { high: 0, medium: 1, low: 2 }
     return severityOrder[a.severity] - severityOrder[b.severity]
   })

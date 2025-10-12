@@ -95,14 +95,14 @@ export default function DashboardPage() {
           <StatsCard
             title="Pagamentos Pendentes"
             value={formatCurrency(financial.total_pending)}
-            description={`${financial.pending_count} pagamento(s)`}
+            description={`${financial.pending_count || 0} pagamento(s)`}
             icon={AlertTriangle}
             iconClassName="text-yellow-600"
           />
           <StatsCard
             title="Pagamentos Atrasados"
             value={formatCurrency(financial.total_overdue)}
-            description={`${financial.overdue_count} pagamento(s)`}
+            description={`${financial.overdue_count || 0} pagamento(s)`}
             icon={AlertTriangle}
             iconClassName="text-red-600"
           />

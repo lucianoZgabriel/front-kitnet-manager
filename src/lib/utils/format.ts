@@ -8,6 +8,15 @@ import { ptBR } from 'date-fns/locale'
  */
 export function formatCurrency(value: string | number): string {
   const num = typeof value === 'string' ? parseFloat(value) : value
+
+  // Se o valor não for válido, retornar R$ 0,00
+  if (isNaN(num) || !isFinite(num)) {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(0)
+  }
+
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',

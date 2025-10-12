@@ -48,8 +48,15 @@ export default function NewUnitPage() {
             maior ou igual ao valor base)
           </p>
           <p>
-            • <strong>Valor Atual:</strong> Será calculado automaticamente baseado no status de
-            renovação da unidade
+            • <strong>Unidade Renovada:</strong> Marque esta opção se a unidade já está reformada. O
+            valor atual do aluguel será baseado nesta seleção.
+          </p>
+          <p>
+            • <strong>Valor Atual:</strong> Será calculado automaticamente:
+            <br />
+            &nbsp;&nbsp;- Se <strong>não renovada</strong>: usa o Valor Base
+            <br />
+            &nbsp;&nbsp;- Se <strong>renovada</strong>: usa o Valor Renovado
           </p>
           <p>
             • A unidade será criada com status <strong>&ldquo;Disponível&rdquo;</strong> por padrão

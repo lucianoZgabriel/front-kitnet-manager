@@ -45,12 +45,29 @@ export function UnitForm({ unit, mode }: UnitFormProps) {
   const onSubmit = async (data: UnitFormData) => {
     try {
       if (mode === 'create') {
-        await createUnit.mutateAsync({
+        // 1. Criar a unidade (sempre cria com is_renovated=false)
+        const newUnit = await createUnit.mutateAsync({
           number: data.number,
           floor: data.floor,
           base_rent_value: data.base_rent_value,
           renovated_rent_value: data.renovated_rent_value,
         })
+
+        // 2. Se is_renovated for true, fazer update imediatamente
+        if (data.is_renovated && newUnit) {
+          await updateUnit.mutateAsync({
+            id: newUnit.id,
+            data: {
+              number: data.number,
+              floor: data.floor,
+              base_rent_value: data.base_rent_value,
+              renovated_rent_value: data.renovated_rent_value,
+              is_renovated: true,
+              notes: data.notes,
+            },
+          })
+        }
+
         router.push('/units')
       } else if (unit) {
         await updateUnit.mutateAsync({
@@ -150,25 +167,25 @@ export function UnitForm({ unit, mode }: UnitFormProps) {
         </div>
 
         {/* Unidade Renovada */}
-        {mode === 'edit' && (
-          <FormField
-            control={form.control}
-            name="is_renovated"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-y-0 space-x-3 rounded-md border p-4">
-                <FormControl>
-                  <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel>Unidade Renovada</FormLabel>
-                  <FormDescription>
-                    Marque se a unidade já passou por reforma (isso altera o valor atual do aluguel)
-                  </FormDescription>
-                </div>
-              </FormItem>
-            )}
-          />
-        )}
+        <FormField
+          control={form.control}
+          name="is_renovated"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-y-0 space-x-3 rounded-md border p-4">
+              <FormControl>
+                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>Unidade Renovada</FormLabel>
+                <FormDescription>
+                  Marque se a unidade já está reformada. O valor atual do aluguel será baseado nesta
+                  seleção:
+                  {field.value ? ' Valor Renovado' : ' Valor Base'}
+                </FormDescription>
+              </div>
+            </FormItem>
+          )}
+        />
 
         {/* Observações */}
         {mode === 'edit' && (

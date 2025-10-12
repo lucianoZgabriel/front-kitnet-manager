@@ -20,7 +20,7 @@ export interface NavItem {
 export const mainNav: NavItem[] = [
   {
     title: 'Dashboard',
-    href: '/',
+    href: '/dashboard',
     icon: Home,
   },
   {

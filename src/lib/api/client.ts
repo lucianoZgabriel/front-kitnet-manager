@@ -37,24 +37,29 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => {
     // A API retorna { success: true, data: {...}, message: "..." }
-    // Vamos retornar apenas o data para simplificar
-    return response.data.data
+    // Retornar o response completo para ter acesso a success e message quando necessário
+    return response.data
   },
   (error) => {
     // Se 401, limpar auth e redirecionar para login
     if (error.response?.status === 401) {
       if (typeof window !== 'undefined') {
         localStorage.removeItem('auth-storage')
-        window.location.href = '/login'
+        // Não redirecionar se já estiver na página de login
+        if (!window.location.pathname.includes('/login')) {
+          window.location.href = '/login'
+        }
       }
     }
 
-    // Retornar erro formatado
-    const errorMessage = error.response?.data?.error || error.message || 'Erro desconhecido'
+    // Retornar erro formatado baseado na resposta da API
+    const apiError = error.response?.data?.error || error.message || 'Erro desconhecido'
+
     return Promise.reject({
-      message: errorMessage,
+      message: apiError,
       status: error.response?.status,
       data: error.response?.data,
+      originalError: error,
     })
   }
 )

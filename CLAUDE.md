@@ -2,6 +2,23 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## MANDATORY INSTRUCTIONS
+
+**⚠️ FILE ENCODING - CRITICAL:**
+- **ALL files MUST be created with UTF-8 encoding**
+- **ALL Portuguese text MUST use proper accents and special characters**
+- Examples of CORRECT usage:
+  - ✅ "Usuário" (NOT "Usuario")
+  - ✅ "Função" (NOT "Funcao")
+  - ✅ "Informações" (NOT "Informacoes")
+  - ✅ "Autenticação" (NOT "Autenticacao")
+  - ✅ "Próximos" (NOT "Proximos")
+  - ✅ "Gestão" (NOT "Gestao")
+  - ✅ "válido" (NOT "valido")
+- When creating files, ALWAYS verify encoding is UTF-8
+- Use Edit tool (not Write tool with bash heredoc) for files with Portuguese text
+- Never use ISO-8859 or other non-UTF-8 encodings
+
 ## Project Overview
 
 This is the **frontend documentation repository** for Kitnet Manager - a property management system for administering 31 rental units (kitnets). The repository contains comprehensive API documentation, TypeScript type definitions, and integration guides for building the frontend application.

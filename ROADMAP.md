@@ -13,7 +13,7 @@ Roadmap completo para desenvolvimento do frontend do Kitnet Manager, organizado 
 
 ---
 
-## Sprint 0: Setup & Foundation (Semana 1)
+## Sprint 0: Setup & Foundation (Semana 1) ✅
 
 ### Objetivos
 - Inicializar projeto Next.js 15
@@ -24,21 +24,15 @@ Roadmap completo para desenvolvimento do frontend do Kitnet Manager, organizado 
 ### Tarefas
 
 #### Setup Inicial
-- [ ] Criar projeto Next.js 15 com TypeScript
-  ```bash
-  npx create-next-app@latest kitnet-manager-frontend --typescript --tailwind --app
-  ```
-- [ ] Configurar estrutura de pastas conforme ARCHITECTURE.md
-- [ ] Copiar types de `frontend-docs/types/` para `src/types/api/`
-- [ ] Setup ESLint + Prettier + Husky
-- [ ] Configurar `tsconfig.json` com path aliases
+- [x] Criar projeto Next.js 15 com TypeScript
+- [x] Configurar estrutura de pastas conforme ARCHITECTURE.md
+- [x] Copiar types de `frontend-docs/types/` para `src/types/api/`
+- [x] Setup ESLint + Prettier + Husky
+- [x] Configurar `tsconfig.json` com path aliases
 
 #### shadcn/ui
-- [ ] Inicializar shadcn/ui
-  ```bash
-  npx shadcn-ui@latest init
-  ```
-- [ ] Adicionar componentes base:
+- [x] Inicializar shadcn/ui
+- [x] Adicionar componentes base:
   - Button, Input, Label, Textarea
   - Card, Badge, Alert
   - Dialog, Sheet, Dropdown Menu
@@ -47,22 +41,22 @@ Roadmap completo para desenvolvimento do frontend do Kitnet Manager, organizado 
   - Form, Select
 
 #### Core Setup
-- [ ] Configurar TailwindCSS com tema customizado
-- [ ] Setup axios client (`lib/api/client.ts`)
-- [ ] Setup React Query (`lib/queries/query-client.ts`)
-- [ ] Setup Zustand stores (auth, ui)
-- [ ] Criar utilities base (cn, format, validation)
-- [ ] Configurar environment variables
+- [x] Configurar TailwindCSS com tema customizado
+- [x] Setup axios client (`lib/api/client.ts`)
+- [x] Setup React Query (`lib/queries/query-client.ts`)
+- [x] Setup Zustand stores (auth, ui)
+- [x] Criar utilities base (cn, format, validation)
+- [x] Configurar environment variables
 
 #### Layout Base
-- [ ] Root layout com providers
-- [ ] Loading e error boundaries globais
-- [ ] Página 404
+- [x] Root layout com providers
+- [x] Loading e error boundaries globais
+- [x] Página 404
 
 #### CI/CD
-- [ ] Setup GitHub Actions (lint + type-check + build)
-- [ ] Conectar repositório com Vercel
-- [ ] Configurar environment variables na Vercel
+- [x] Setup GitHub Actions (lint + type-check + build)
+- [x] Conectar repositório com Vercel
+- [x] Configurar environment variables na Vercel
 
 ### Entregáveis
 ✅ Projeto inicializado e rodando em `localhost:3000`
@@ -70,9 +64,12 @@ Roadmap completo para desenvolvimento do frontend do Kitnet Manager, organizado 
 ✅ Componentes shadcn/ui prontos para uso
 ✅ Estrutura base completa
 
+**Concluído em:** 11/01/2025
+**Commit:** 0176b33
+
 ---
 
-## Sprint 1: Authentication & Layout (Semana 2)
+## Sprint 1: Authentication & Layout (Semana 2) ✅
 
 ### Objetivos
 - Sistema de autenticação completo
@@ -82,43 +79,56 @@ Roadmap completo para desenvolvimento do frontend do Kitnet Manager, organizado 
 ### Tarefas
 
 #### Authentication
-- [ ] Criar página de login (`app/(auth)/login/page.tsx`)
-- [ ] Implementar LoginForm com React Hook Form + Zod
-- [ ] Criar `useLogin` mutation (React Query)
-- [ ] Implementar auth store (Zustand + persist)
-- [ ] Configurar axios interceptors (token + 401 handling)
-- [ ] Criar `useCurrentUser` query
-- [ ] Implementar logout
+- [x] Implementar auth store (Zustand + persist)
+- [x] Configurar axios interceptors (token + 401 handling)
+- [x] Criar auth service com todos os endpoints
+- [x] Criar AuthContext e useAuth hook
+- [x] Integrar providers no layout principal
+- [x] Criar página de login (`app/(auth)/login/page.tsx`)
+- [x] Implementar LoginForm com React Hook Form + Zod
+- [x] Implementar logout funcional
+- [x] Dashboard temporário para testes
+- [x] Corrigir encoding UTF-8 e redirect issues
 
 #### Layout Principal
-- [ ] Criar layout group `(dashboard)`
-- [ ] Implementar Header component
+- [x] Criar layout group `(dashboard)`
+- [x] Implementar Header component
   - Logo + título
   - User dropdown (perfil + logout)
-  - Breadcrumbs
-- [ ] Implementar Sidebar component
+  - Toggle de menu (mobile e desktop)
+- [x] Implementar Sidebar component
   - Navegação principal
   - Indicador de rota ativa
-  - Versão mobile (Sheet)
-- [ ] Criar MobileNav component
-- [ ] Implementar toggle de sidebar (Zustand)
+  - Collapsible (80px ↔ 256px)
+- [x] Criar MobileSidebar component
+  - Sheet drawer deslizante
+  - Navegação completa para mobile
+  - Auto-close ao navegar
+- [x] Implementar toggle de sidebar (Zustand)
 
 #### Proteção de Rotas
-- [ ] Middleware para verificar auth
-- [ ] Redirect para /login se não autenticado
-- [ ] Redirect para /dashboard se já autenticado (na página de login)
+- [x] Layout-level auth protection (redirect para /login se não autenticado)
+- [x] Redirect para /dashboard se já autenticado (na página de login)
+- [ ] Middleware para verificar auth (opcional - proteção adicional)
 
 #### Componentes Compartilhados
-- [ ] LoadingSpinner
-- [ ] EmptyState
-- [ ] ErrorMessage
-- [ ] ConfirmDialog
+- [x] LoadingSpinner (com LoadingPage variant)
+- [x] EmptyState (com ícone, ação e descrição)
+- [x] ErrorMessage (com ErrorPage variant e retry)
+- [x] ConfirmDialog (com variant destructive e loading state)
 
 ### Entregáveis
+✅ Auth Store e API Client implementados
+✅ AuthContext e useAuth hook criados
 ✅ Login funcional com JWT
-✅ Layout principal responsivo
-✅ Navegação entre páginas
+✅ Layout principal responsivo (desktop + mobile)
+✅ Navegação entre páginas (sidebar + mobile drawer)
 ✅ Proteção de rotas implementada
+✅ Componentes compartilhados (LoadingSpinner, EmptyState, ErrorMessage, ConfirmDialog)
+
+**Concluído em:** 11/01/2025
+**Branch:** feature/sprint1-authentication
+**Commits:** 573ca53 → current
 
 ---
 

@@ -22,7 +22,7 @@ import {
 import { UnitStatusBadge } from './unit-status-badge'
 import { formatCurrency } from '@/src/lib/utils/format'
 import type { Unit, UnitStatus } from '@/src/types/api/unit'
-import { Eye, Search } from 'lucide-react'
+import { Eye, Edit, Search } from 'lucide-react'
 
 interface UnitsTableProps {
   units: Unit[]
@@ -130,11 +130,18 @@ export function UnitsTable({ units }: UnitsTableProps) {
                     {formatCurrency(unit.current_rent_value)}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" asChild>
-                      <Link href={`/units/${unit.id}`}>
-                        <Eye className="h-4 w-4" />
-                      </Link>
-                    </Button>
+                    <div className="flex items-center justify-end gap-1">
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link href={`/units/${unit.id}`}>
+                          <Eye className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link href={`/units/${unit.id}?edit=true`}>
+                          <Edit className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))

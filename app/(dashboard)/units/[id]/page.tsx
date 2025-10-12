@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useUnit, useDeleteUnit, useUpdateUnitStatus } from '@/src/hooks/use-units'
 import { UnitForm } from '@/src/components/units/unit-form'
@@ -25,6 +25,7 @@ import type { UnitStatus } from '@/src/types/api/unit'
 export default function UnitDetailsPage() {
   const params = useParams()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const id = params.id as string
 
   const { data: unit, isLoading, error, refetch } = useUnit(id)
@@ -34,6 +35,13 @@ export default function UnitDetailsPage() {
   const [isEditing, setIsEditing] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [selectedStatus, setSelectedStatus] = useState<UnitStatus | null>(null)
+
+  // Detectar query param ?edit=true para entrar direto no modo de edição
+  useEffect(() => {
+    if (searchParams.get('edit') === 'true') {
+      setIsEditing(true)
+    }
+  }, [searchParams])
 
   if (isLoading) {
     return (
@@ -57,7 +65,7 @@ export default function UnitDetailsPage() {
     try {
       await deleteUnit.mutateAsync(id)
       router.push('/units')
-    } catch (error) {
+    } catch {
       // Erro já tratado pelo hook com toast
     }
   }
@@ -68,7 +76,7 @@ export default function UnitDetailsPage() {
     try {
       await updateStatus.mutateAsync({ id, status: newStatus })
       setSelectedStatus(null)
-    } catch (error) {
+    } catch {
       // Erro já tratado pelo hook com toast
     }
   }

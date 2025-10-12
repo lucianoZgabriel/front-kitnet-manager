@@ -81,7 +81,7 @@ export function UnitForm({ unit, mode }: UnitFormProps) {
             notes: data.notes,
           },
         })
-        router.push(`/units/${unit.id}`)
+        router.push('/units')
       }
     } catch (error) {
       // Erro já é tratado pelo hook com toast

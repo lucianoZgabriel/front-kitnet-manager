@@ -23,31 +23,42 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const { user, token, setAuth, clearAuth } = useAuthStore()
+  const { user, token, _hasHydrated, setAuth, clearAuth } = useAuthStore()
   const [isLoading, setIsLoading] = useState(true)
+  const [hasInitialized, setHasInitialized] = useState(false)
 
-  // Verificar se h� token ao carregar e buscar dados do usu�rio
+  // Aguardar hidratação do Zustand antes de inicializar
   useEffect(() => {
+    // Só executar UMA VEZ após a hidratação completar
+    if (!_hasHydrated || hasInitialized) {
+      return
+    }
+
     const initializeAuth = async () => {
       if (token) {
         try {
           const response = await authService.getCurrentUser()
           if (response.success && response.data) {
             setAuth(response.data, token)
-          } else {
-            clearAuth()
           }
+          // Se falhar, não fazer nada - manter dados em cache
         } catch (error) {
-          console.error('Failed to fetch user data:', error)
-          clearAuth()
+          // NÃO limpar auth - pode ser erro temporário (500, network, etc)
+          // Se for 401, o interceptor do axios já vai redirecionar
+        } finally {
+          // SEMPRE setar isLoading = false DEPOIS da API call completar
+          setIsLoading(false)
+          setHasInitialized(true)
         }
+      } else {
+        setIsLoading(false)
+        setHasInitialized(true)
       }
-      setIsLoading(false)
     }
 
     initializeAuth()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []) // Executar apenas na montagem inicial
+  }, [_hasHydrated])
 
   const login = async (credentials: LoginRequest) => {
     try {
@@ -85,9 +96,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (response.success && response.data) {
         setAuth(response.data, token)
       }
+      // Se falhar, não fazer nada - manter dados em cache
     } catch (error) {
-      console.error('Failed to refresh user data:', error)
-      clearAuth()
+      // NÃO limpar auth - pode ser erro temporário
+      // Se for 401, o interceptor do axios já vai redirecionar
     }
   }
 

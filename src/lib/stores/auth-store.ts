@@ -27,29 +27,14 @@ const createResilientStorage = () => {
           const parsed = JSON.parse(value)
           const hasValidData = parsed?.state?.user && parsed?.state?.token
 
-          console.log('📖 [AuthStore] getItem - Lendo do localStorage:', {
-            hasUser: !!parsed?.state?.user,
-            hasToken: !!parsed?.state?.token,
-            username: parsed?.state?.user?.username,
-            hasValidData,
-          })
-
-          // CRÍTICO: Se localStorage tem dados válidos, usar e fazer backup
+          // Se localStorage tem dados válidos, usar e fazer backup
           if (hasValidData) {
             sessionStorage.setItem(BACKUP_KEY, value)
             return value
           }
-
-          // Se localStorage existe mas está com state vazio, NÃO usar!
-          // Tentar recuperar do backup em vez disso
-          console.warn(
-            '⚠️ [AuthStore] localStorage tem dados MAS state está vazio! Tentando backup...'
-          )
         } catch {
-          console.error('❌ [AuthStore] Erro ao parse do localStorage')
+          // Erro ao parse, continuar para tentar backup
         }
-      } else {
-        console.log('📖 [AuthStore] localStorage completamente vazio, tentando backup...')
       }
 
       // Tentar recuperar do sessionStorage (backup)
@@ -59,19 +44,15 @@ const createResilientStorage = () => {
         try {
           const parsed = JSON.parse(backup)
           if (parsed?.state?.user && parsed?.state?.token) {
-            console.log('🔄 [AuthStore] RECUPERADO do backup! Restaurando...', {
-              username: parsed.state.user.username,
-            })
             // Restaurar no localStorage
             localStorage.setItem(name, backup)
             return backup
           }
         } catch {
-          console.error('❌ [AuthStore] Erro ao parse do backup')
+          // Erro ao parse do backup
         }
       }
 
-      console.warn('⚠️ [AuthStore] Nenhum dado encontrado (nem localStorage nem backup)')
       return null
     },
 
@@ -82,52 +63,37 @@ const createResilientStorage = () => {
         const parsed = JSON.parse(value)
         const state = parsed?.state
 
-        console.log('🔍 [AuthStore] setItem chamado:', {
-          hasUser: !!state?.user,
-          hasToken: !!state?.token,
-          username: state?.user?.username,
-          tokenPreview: state?.token?.substring(0, 20) + '...',
-        })
-
-        // CRÍTICO: Não persistir estado vazio!
+        // Não persistir estado vazio sobre dados válidos
         if (!state?.user || !state?.token) {
-          // Se tentando salvar estado vazio, verificar se já existe dados válidos
           const existing = localStorage.getItem(name)
           if (existing) {
             const existingParsed = JSON.parse(existing)
             const existingState = existingParsed?.state
 
-            // Se já existe user E token válidos, NÃO sobrescrever com vazio
+            // Se já existe user E token válidos, NÃO sobrescrever
             if (existingState?.user && existingState?.token) {
-              console.warn(
-                '⚠️ [AuthStore] BLOQUEADO! Tentativa de sobrescrever dados válidos com vazio'
-              )
-              return // Abortar persist de estado vazio
+              return // Bloquear persist de estado vazio
             }
           }
 
           // Se está limpando auth (logout), limpar backup também
           sessionStorage.removeItem(BACKUP_KEY)
-          console.log('✅ [AuthStore] Permitindo persist de estado vazio (nenhum dado anterior)')
         }
 
         // Persistir normalmente
-        console.log('💾 [AuthStore] Persistindo no localStorage')
         localStorage.setItem(name, value)
 
         // Se tem dados válidos, salvar backup
         if (state?.user && state?.token) {
           sessionStorage.setItem(BACKUP_KEY, value)
-          console.log('💾 [AuthStore] Backup salvo no sessionStorage')
         }
-      } catch (error) {
-        console.error('[AuthStore] Erro ao validar persist:', error)
+      } catch {
+        // Erro ao validar persist
       }
     },
 
     removeItem: (name: string) => {
       if (typeof window === 'undefined') return
-      console.log('🗑️ [AuthStore] removeItem chamado')
       localStorage.removeItem(name)
       sessionStorage.removeItem(BACKUP_KEY)
     },
@@ -142,12 +108,9 @@ export const useAuthStore = create<AuthState>()(
       _hasHydrated: false,
       setHasHydrated: (hydrated) => set({ _hasHydrated: hydrated }),
       setAuth: (user, token) => {
-        console.log('✅ [AuthStore] setAuth chamado:', { username: user.username })
         set({ user, token })
       },
       clearAuth: () => {
-        console.error('🚨 [AuthStore] clearAuth CHAMADO! Stack trace:')
-        console.trace()
         set({ user: null, token: null })
       },
     }),

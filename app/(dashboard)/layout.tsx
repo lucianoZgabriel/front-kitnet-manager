@@ -9,54 +9,20 @@ import { Header } from '@/src/components/layout/header'
 import { useUIStore } from '@/src/lib/stores/ui-store'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const auth = useAuth()
-  const { isAuthenticated, isLoading, user, token } = auth
+  const { isAuthenticated, isLoading } = useAuth()
   const { sidebarOpen } = useUIStore()
   const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  console.log('🏗️ [Dashboard Layout] Render:', {
-    isLoading,
-    isAuthenticated,
-    hasUser: !!user,
-    hasToken: !!token,
-    username: user?.username,
-    tokenPreview: token ? token.substring(0, 20) + '...' : null,
-  })
 
-  // Monitor específico para mudanças no isAuthenticated
+  // Redirecionar para login se não autenticado
   useEffect(() => {
-    console.log('🔔 [Dashboard Layout] isAuthenticated MUDOU para:', isAuthenticated, {
-      hasUser: !!user,
-      hasToken: !!token,
-      username: user?.username,
-    })
-  }, [isAuthenticated, user, token])
-
-  // LÓGICA SUPER SIMPLES: Se não está autenticado E não está carregando, redirecionar
-  useEffect(() => {
-    console.log('🔍 [Dashboard Layout] Effect rodou:', {
-      isLoading,
-      isAuthenticated,
-    })
-
-    // Se está carregando, não fazer nada
-    if (isLoading) {
-      console.log('⏳ [Dashboard Layout] Carregando...')
-      return
-    }
-
-    // Se não está autenticado, redirecionar IMEDIATAMENTE
-    if (!isAuthenticated) {
-      console.error('🚪 [Dashboard Layout] Não autenticado! Redirecionando...')
+    if (!isLoading && !isAuthenticated) {
       router.push('/login')
-    } else {
-      console.log('✅ [Dashboard Layout] Usuário autenticado!')
     }
   }, [isAuthenticated, isLoading, router])
 
   // Mostrar loading enquanto carrega
   if (isLoading) {
-    console.log('⏳ [Dashboard Layout] Renderizando loading...')
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
@@ -69,12 +35,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   // Se não está autenticado, mostrar nada (vai redirecionar)
   if (!isAuthenticated) {
-    console.log('⏸️ [Dashboard Layout] Não autenticado, retornando null...')
     return null
   }
 
-  // Renderizar o layout
-  console.log('✅ [Dashboard Layout] Renderizando layout completo')
   return (
     <div className="bg-background flex min-h-screen">
       <Sidebar />

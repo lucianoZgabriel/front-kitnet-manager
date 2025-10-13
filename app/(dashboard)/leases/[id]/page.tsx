@@ -43,9 +43,9 @@ export default function LeaseDetailsPage() {
   const cancelLease = useCancelLease()
   const renewLease = useRenewLease()
 
-  // Buscar dados relacionados
-  const { data: tenant } = useTenant(lease?.tenant_id || '')
-  const { data: unit } = useUnit(lease?.unit_id || '')
+  // Buscar dados relacionados (só busca quando lease está carregado)
+  const { data: tenant } = useTenant(lease?.tenant_id ?? '')
+  const { data: unit } = useUnit(lease?.unit_id ?? '')
 
   const [showCancelDialog, setShowCancelDialog] = useState(false)
   const [showRenewDialog, setShowRenewDialog] = useState(false)

@@ -60,7 +60,7 @@ export function LeaseForm({}: LeaseFormProps) {
       start_date: '',
       payment_due_day: 5,
       monthly_rent_value: '',
-      painting_fee_total: '',
+      painting_fee_total: '0.00',
       painting_fee_installments: 2,
     },
   })
@@ -79,9 +79,20 @@ export function LeaseForm({}: LeaseFormProps) {
 
   const onSubmit = async (data: LeaseFormData) => {
     try {
-      const result = await createLease.mutateAsync(data)
+      // Formatar valores monetários para ter 2 casas decimais
+      // Formatar datas para ISO 8601 com horário (YYYY-MM-DDTHH:MM:SSZ)
+      const formattedData: LeaseFormData = {
+        ...data,
+        contract_signed_date: `${data.contract_signed_date}T00:00:00Z`,
+        start_date: `${data.start_date}T00:00:00Z`,
+        monthly_rent_value: parseFloat(data.monthly_rent_value).toFixed(2),
+        painting_fee_total: parseFloat(data.painting_fee_total).toFixed(2),
+      }
+
+      const result = await createLease.mutateAsync(formattedData)
       router.push(`/leases/${result.lease.id}`)
     } catch (error) {
+      // Erro já tratado pelo hook com toast
       console.error('Erro ao criar contrato:', error)
     }
   }

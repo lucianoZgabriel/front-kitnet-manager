@@ -42,13 +42,13 @@ export const leaseFormSchema = z
   })
   .refine(
     (data) => {
-      // Validar que start_date é depois de contract_signed_date
+      // Validar que start_date é depois de contract_signed_date (não pode ser igual)
       const signedDate = new Date(data.contract_signed_date)
       const startDate = new Date(data.start_date)
-      return startDate >= signedDate
+      return startDate > signedDate
     },
     {
-      message: 'Data de início deve ser posterior ou igual à data de assinatura',
+      message: 'Data de início deve ser posterior à data de assinatura (pelo menos 1 dia depois)',
       path: ['start_date'],
     }
   )

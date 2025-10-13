@@ -39,17 +39,11 @@ const createValidatedStorage = () => {
             const existingParsed = JSON.parse(existing)
             const existingState = existingParsed?.state
 
-            // Se já tem auth válido, NÃO sobrescrever com inválido
+            // Se já tem auth válido, NÃO sobrescrever com inválido (proteção HMR)
             if (existingState?.user && existingState?.token) {
-              console.warn(
-                '[AUTH STORE] BLOQUEADO: tentativa de sobrescrever auth válido com inválido'
-              )
               return // BLOQUEAR persist
             }
           }
-
-          // Se não tem auth válido no storage, permitir limpar
-          console.log('[AUTH STORE] Limpando auth storage (logout ou estado inicial)')
         }
 
         // Estado válido OU limpeza intencional, persistir
@@ -78,14 +72,8 @@ export const useAuthStore = create<AuthState>()(
       _hasHydrated: false,
       setHasHydrated: (hydrated) => set({ _hasHydrated: hydrated }),
       setAuth: (user, token) => {
-        // Validar antes de salvar
         if (user && token) {
           set({ user, token })
-        } else {
-          console.error('[AUTH STORE] Tentativa de setAuth com dados inválidos:', {
-            hasUser: !!user,
-            hasToken: !!token,
-          })
         }
       },
       clearAuth: () => {
@@ -101,41 +89,28 @@ export const useAuthStore = create<AuthState>()(
       }),
       onRehydrateStorage: () => {
         return (state) => {
-          // Validar estado após hydration
           if (state) {
             const hasValidAuth = state.user && state.token
 
-            if (hasValidAuth) {
-              console.log('[AUTH STORE] Hydration bem-sucedida com auth válido')
-            } else {
-              // IMPORTANTE: Durante HMR, o state pode estar temporariamente inválido
-              // MAS o localStorage pode ainda ter dados válidos que foram bloqueados
-              // Verificar localStorage antes de limpar
+            if (!hasValidAuth) {
+              // Durante HMR, verificar se localStorage tem dados válidos antes de limpar
               if (typeof window !== 'undefined') {
                 try {
                   const authStorage = localStorage.getItem('auth-storage')
                   if (authStorage) {
                     const { state: storedState } = JSON.parse(authStorage)
                     if (storedState?.user && storedState?.token) {
-                      console.log(
-                        '[AUTH STORE] Hydration com state inválido MAS localStorage válido - restaurando'
-                      )
                       // Restaurar do localStorage
                       state.user = storedState.user
                       state.token = storedState.token
                       state.setHasHydrated(true)
-                      return // NÃO limpar
+                      return
                     }
                   }
                 } catch (error) {
                   console.error('[AUTH STORE] Erro ao verificar localStorage:', error)
                 }
               }
-
-              // Só limpar se localStorage também está inválido
-              console.warn(
-                '[AUTH STORE] Hydration com auth inválido E localStorage inválido, limpando...'
-              )
               state.clearAuth()
             }
             state.setHasHydrated(true)

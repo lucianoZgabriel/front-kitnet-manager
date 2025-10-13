@@ -43,9 +43,13 @@ export default function LeaseDetailsPage() {
   const cancelLease = useCancelLease()
   const renewLease = useRenewLease()
 
-  // Buscar dados relacionados (só busca quando lease está carregado)
-  const { data: tenant } = useTenant(lease?.tenant_id ?? '')
-  const { data: unit } = useUnit(lease?.unit_id ?? '')
+  // Buscar dados relacionados (só busca quando lease está carregado e IDs são válidos)
+  const {
+    data: tenant,
+    isLoading: tenantLoading,
+    error: tenantError,
+  } = useTenant(lease?.tenant_id || '')
+  const { data: unit, isLoading: unitLoading, error: unitError } = useUnit(lease?.unit_id || '')
 
   const [showCancelDialog, setShowCancelDialog] = useState(false)
   const [showRenewDialog, setShowRenewDialog] = useState(false)
@@ -203,7 +207,16 @@ export default function LeaseDetailsPage() {
             <CardTitle>Unidade</CardTitle>
           </CardHeader>
           <CardContent>
-            {unit ? (
+            {unitLoading ? (
+              <div className="flex items-center justify-center py-4">
+                <LoadingSpinner size="sm" />
+              </div>
+            ) : unitError ? (
+              <div className="text-muted-foreground py-4 text-center text-sm">
+                <p>Erro ao carregar dados da unidade</p>
+                <p className="text-xs">ID: {lease?.unit_id}</p>
+              </div>
+            ) : unit ? (
               <div className="space-y-2">
                 <div>
                   <p className="text-muted-foreground text-sm font-medium">Número</p>
@@ -222,7 +235,9 @@ export default function LeaseDetailsPage() {
                 </Button>
               </div>
             ) : (
-              <LoadingSpinner size="sm" />
+              <div className="text-muted-foreground py-4 text-center text-sm">
+                Aguardando dados do contrato...
+              </div>
             )}
           </CardContent>
         </Card>
@@ -233,7 +248,16 @@ export default function LeaseDetailsPage() {
             <CardTitle>Inquilino</CardTitle>
           </CardHeader>
           <CardContent>
-            {tenant ? (
+            {tenantLoading ? (
+              <div className="flex items-center justify-center py-4">
+                <LoadingSpinner size="sm" />
+              </div>
+            ) : tenantError ? (
+              <div className="text-muted-foreground py-4 text-center text-sm">
+                <p>Erro ao carregar dados do inquilino</p>
+                <p className="text-xs">ID: {lease?.tenant_id}</p>
+              </div>
+            ) : tenant ? (
               <div className="space-y-2">
                 <div>
                   <p className="text-muted-foreground text-sm font-medium">Nome</p>
@@ -254,7 +278,9 @@ export default function LeaseDetailsPage() {
                 </Button>
               </div>
             ) : (
-              <LoadingSpinner size="sm" />
+              <div className="text-muted-foreground py-4 text-center text-sm">
+                Aguardando dados do contrato...
+              </div>
             )}
           </CardContent>
         </Card>

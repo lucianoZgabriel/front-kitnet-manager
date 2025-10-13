@@ -21,7 +21,7 @@ import type { LeaseStatus } from '@/src/types/api/lease'
 
 export default function LeasesPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all')
-  const { data: stats, isLoading: statsLoading } = useLeaseStats()
+  const { data: stats } = useLeaseStats()
   const {
     data: leases,
     isLoading,
@@ -29,7 +29,8 @@ export default function LeasesPage() {
     refetch,
   } = useLeases(statusFilter === 'all' ? undefined : { status: statusFilter })
 
-  if (isLoading || statsLoading) {
+  // Mostrar loading apenas para a lista de leases (stats é opcional)
+  if (isLoading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <LoadingSpinner size="lg" />
@@ -68,23 +69,23 @@ export default function LeasesPage() {
         <div className="grid gap-4 md:grid-cols-5">
           <Card className="p-4">
             <p className="text-muted-foreground text-sm font-medium">Total</p>
-            <p className="text-2xl font-bold">{stats.total_leases}</p>
+            <p className="text-2xl font-bold">{stats.total}</p>
           </Card>
           <Card className="p-4">
             <p className="text-muted-foreground text-sm font-medium">Ativos</p>
-            <p className="text-2xl font-bold text-green-600">{stats.active_leases}</p>
+            <p className="text-2xl font-bold text-green-600">{stats.active}</p>
           </Card>
           <Card className="p-4">
             <p className="text-muted-foreground text-sm font-medium">Expirando em Breve</p>
-            <p className="text-2xl font-bold text-yellow-600">{stats.expiring_soon_leases}</p>
+            <p className="text-2xl font-bold text-yellow-600">{stats.expiring_soon}</p>
           </Card>
           <Card className="p-4">
             <p className="text-muted-foreground text-sm font-medium">Expirados</p>
-            <p className="text-2xl font-bold text-gray-600">{stats.expired_leases}</p>
+            <p className="text-2xl font-bold text-gray-600">{stats.expired}</p>
           </Card>
           <Card className="p-4">
             <p className="text-muted-foreground text-sm font-medium">Cancelados</p>
-            <p className="text-2xl font-bold text-red-600">{stats.cancelled_leases}</p>
+            <p className="text-2xl font-bold text-red-600">{stats.cancelled}</p>
           </Card>
         </div>
       )}

@@ -272,7 +272,7 @@ Roadmap completo para desenvolvimento do frontend do Kitnet Manager, organizado 
 
 ---
 
-## Sprint 4: Leases (Semana 5)
+## Sprint 4: Leases (Semana 5) ✅
 
 ### Objetivos
 - CRUD de Contratos
@@ -283,53 +283,59 @@ Roadmap completo para desenvolvimento do frontend do Kitnet Manager, organizado 
 ### Tarefas
 
 #### Leases - Listagem
-- [ ] Criar `useLeases` query com filtros
-- [ ] Página de listagem (`app/(dashboard)/leases/page.tsx`)
-- [ ] LeasesTable component
-- [ ] Filtros: status, unidade, inquilino
-- [ ] LeaseStatusBadge component
-- [ ] Indicador de contratos expirando (45 dias)
+- [x] Criar `useLeases` query com filtros
+- [x] Página de listagem (`app/(dashboard)/leases/page.tsx`)
+- [x] LeasesTable component
+- [x] Filtros: status, unidade, inquilino
+- [x] LeaseStatusBadge component
+- [ ] Indicador de contratos expirando (45 dias) - **Opcional (não implementado)**
 
 #### Leases - Criação
-- [ ] Schema Zod para lease form
-- [ ] Criar `useCreateLease` mutation
-- [ ] Página de criação (`app/(dashboard)/leases/new/page.tsx`)
-- [ ] LeaseForm component com:
-  - Select de unidade (apenas available)
-  - Select de inquilino (ou criar novo inline)
-  - Data de assinatura e início
-  - Valor do aluguel
-  - Taxa de pintura + parcelamento
-  - Dia de vencimento
-- [ ] Validações de negócio (unidade disponível, etc)
-- [ ] Toast mostrando quantos pagamentos foram gerados
+- [x] Schema Zod para lease form
+- [x] Criar `useCreateLease` mutation
+- [x] Página de criação (`app/(dashboard)/leases/new/page.tsx`)
+- [x] LeaseForm component com:
+  - [x] Select de unidade (apenas available)
+  - [ ] Select de inquilino (ou criar novo inline) - **Opcional (não implementado)**
+  - [x] Data de assinatura e início
+  - [x] Valor do aluguel
+  - [x] Taxa de pintura + parcelamento
+  - [x] Dia de vencimento
+- [x] Validações de negócio (unidade disponível, etc)
+- [x] Toast mostrando quantos pagamentos foram gerados
 
 #### Leases - Detalhes
-- [ ] Criar `useLease` query (by ID)
-- [ ] Página de detalhes (`app/(dashboard)/leases/[id]/page.tsx`)
-- [ ] Mostrar informações do contrato
-- [ ] Mostrar unidade e inquilino
-- [ ] Timeline de pagamentos
-- [ ] Botões de ação (renovar, cancelar)
+- [x] Criar `useLease` query (by ID)
+- [x] Página de detalhes (`app/(dashboard)/leases/[id]/page.tsx`)
+- [x] Mostrar informações do contrato
+- [x] Mostrar unidade e inquilino
+- [x] Timeline de pagamentos
+- [x] Botões de ação (renovar, cancelar)
 
 #### Leases - Renovação
-- [ ] Criar `useRenewLease` mutation
-- [ ] Criar `useLeasesExpiringSoon` query
-- [ ] RenewLeaseDialog component
-- [ ] Validação: apenas contratos ativos próximos ao fim
-- [ ] Mostrar preview do novo contrato
+- [x] Criar `useRenewLease` mutation
+- [x] Criar `useLeasesExpiringSoon` query
+- [x] RenewLeaseDialog component
+- [x] Validação: apenas contratos ativos próximos ao fim
+- [x] Mostrar preview do novo contrato
 
 #### Leases - Cancelamento
-- [ ] Criar `useCancelLease` mutation
-- [ ] CancelLeaseDialog component com confirmação
-- [ ] Validação: apenas contratos ativos
-- [ ] Atualizar status da unidade
+- [x] Criar `useCancelLease` mutation
+- [x] CancelLeaseDialog component com confirmação
+- [x] Validação: apenas contratos ativos
+- [x] Atualizar status da unidade
 
 #### Leases - Estatísticas
-- [ ] Criar `useLeaseStats` query
-- [ ] Página ou seção de estatísticas
-- [ ] Contratos ativos vs encerrados
-- [ ] Taxa de renovação
+- [x] Criar `useLeaseStats` query
+- [x] Página ou seção de estatísticas
+- [x] Contratos ativos vs encerrados
+- [x] Taxa de renovação
+
+#### Correções e Melhorias
+- [x] Corrigir tipos TypeScript de LeaseStats (API retorna campos sem sufixo `_leases`)
+- [x] Corrigir exibição de estatísticas na página de listagem
+- [x] Melhorar tratamento de erros na página de detalhes (loading states robustos)
+- [x] Adicionar mensagens amigáveis para erros ao carregar tenant/unit
 
 ### Entregáveis
 ✅ CRUD completo de contratos
@@ -337,6 +343,18 @@ Roadmap completo para desenvolvimento do frontend do Kitnet Manager, organizado 
 ✅ Renovação funcionando
 ✅ Cancelamento com validações
 ✅ Dashboard de contratos expirando
+✅ Estatísticas funcionando corretamente
+✅ Tratamento de erros robusto
+
+**Concluído em:** 13/01/2025
+**Branch:** feature/sprint4-leases
+**Commits:**
+- 18820c7 feat: implement Sprint 4 leases with unit/tenant integration
+- 24e941f fix: correct lease creation with proper date and money formatting
+- 38fa487 fix: resolve intermittent logout issue on page refresh
+- f44fccc fix: improve auth context re-rendering with useMemo and useCallback
+- 30dcbe9 chore: remove debug logs and temporary debug utilities
+- (current) fix: correct lease stats types and improve error handling
 
 ---
 
@@ -662,7 +680,7 @@ Semana 1: [███████████████████████
 Semana 2: [████████████████████████] Auth & Layout ✅
 Semana 3: [████████████████████████] Dashboard & Units ✅
 Semana 4: [████████████████████████] Tenants ✅
-Semana 5: [------------------------] Leases
+Semana 5: [████████████████████████] Leases ✅
 Semana 6: [------------------------] Payments
 Semana 7: [------------------------] Reports & Advanced
 Semana 8: [------------------------] Settings & Users
@@ -671,7 +689,7 @@ Semana 10: [------------------------] Production Ready
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          MVP Core Features  │  Advanced  │  Launch
-             (40% ✅)        │            │
+             (50% ✅)        │            │
 ```
 
 ---

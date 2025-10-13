@@ -64,6 +64,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     async (credentials: LoginRequest) => {
       try {
         setIsLoading(true)
+
+        // CRÍTICO: Limpar qualquer estado corrompido antes de fazer login
+        clearAuth()
+
         const response = await authService.login(credentials)
 
         if (response.success && response.data) {
@@ -83,7 +87,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setIsLoading(false)
       }
     },
-    [setAuth]
+    [setAuth, clearAuth]
   )
 
   const logout = useCallback(() => {

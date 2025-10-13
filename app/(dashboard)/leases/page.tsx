@@ -21,6 +21,8 @@ import type { LeaseStatus } from '@/src/types/api/lease'
 
 export default function LeasesPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all')
+  // TEMPORARIAMENTE DESABILITADO PARA TESTAR SE QUERIES SIMULTÂNEAS CAUSAM 401
+  // const { data: stats } = useLeaseStats()
   const { data: stats } = useLeaseStats()
   const {
     data: leases,

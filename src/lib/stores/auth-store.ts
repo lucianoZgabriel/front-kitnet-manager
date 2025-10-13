@@ -11,91 +11,61 @@ interface AuthState {
   clearAuth: () => void
 }
 
-// Storage customizado com fallback para sessionStorage
-const createResilientStorage = () => {
-  const BACKUP_KEY = 'auth-storage-backup'
-
+// Storage com validação para prevenir estado corrompido em dev mode
+const createValidatedStorage = () => {
   return {
     getItem: (name: string) => {
       if (typeof window === 'undefined') return null
-
-      // Tentar ler do localStorage primeiro
-      const value = localStorage.getItem(name)
-
-      if (value) {
-        try {
-          const parsed = JSON.parse(value)
-          const hasValidData = parsed?.state?.user && parsed?.state?.token
-
-          // Se localStorage tem dados válidos, usar e fazer backup
-          if (hasValidData) {
-            sessionStorage.setItem(BACKUP_KEY, value)
-            return value
-          }
-        } catch {
-          // Erro ao parse, continuar para tentar backup
-        }
+      try {
+        return localStorage.getItem(name)
+      } catch {
+        return null
       }
-
-      // Tentar recuperar do sessionStorage (backup)
-      const backup = sessionStorage.getItem(BACKUP_KEY)
-
-      if (backup) {
-        try {
-          const parsed = JSON.parse(backup)
-          if (parsed?.state?.user && parsed?.state?.token) {
-            // Restaurar no localStorage
-            localStorage.setItem(name, backup)
-            return backup
-          }
-        } catch {
-          // Erro ao parse do backup
-        }
-      }
-
-      return null
     },
 
     setItem: (name: string, value: string) => {
       if (typeof window === 'undefined') return
 
       try {
+        // Validar que o estado tem user E token antes de persistir
         const parsed = JSON.parse(value)
         const state = parsed?.state
 
-        // Não persistir estado vazio sobre dados válidos
-        if (!state?.user || !state?.token) {
+        // Se estado é inválido (sem user OU sem token)
+        if (state && (!state.user || !state.token)) {
+          // Verificar se já existe estado válido no storage
           const existing = localStorage.getItem(name)
           if (existing) {
             const existingParsed = JSON.parse(existing)
             const existingState = existingParsed?.state
 
-            // Se já existe user E token válidos, NÃO sobrescrever
+            // Se já tem auth válido, NÃO sobrescrever com inválido
             if (existingState?.user && existingState?.token) {
-              return // Bloquear persist de estado vazio
+              console.warn(
+                '[AUTH STORE] BLOQUEADO: tentativa de sobrescrever auth válido com inválido'
+              )
+              return // BLOQUEAR persist
             }
           }
 
-          // Se está limpando auth (logout), limpar backup também
-          sessionStorage.removeItem(BACKUP_KEY)
+          // Se não tem auth válido no storage, permitir limpar
+          console.log('[AUTH STORE] Limpando auth storage (logout ou estado inicial)')
         }
 
-        // Persistir normalmente
+        // Estado válido OU limpeza intencional, persistir
         localStorage.setItem(name, value)
-
-        // Se tem dados válidos, salvar backup
-        if (state?.user && state?.token) {
-          sessionStorage.setItem(BACKUP_KEY, value)
-        }
-      } catch {
-        // Erro ao validar persist
+      } catch (error) {
+        console.error('[AUTH STORE] Erro ao validar persist:', error)
       }
     },
 
     removeItem: (name: string) => {
       if (typeof window === 'undefined') return
-      localStorage.removeItem(name)
-      sessionStorage.removeItem(BACKUP_KEY)
+      try {
+        localStorage.removeItem(name)
+      } catch {
+        // Falha silenciosa
+      }
     },
   }
 }
@@ -108,7 +78,15 @@ export const useAuthStore = create<AuthState>()(
       _hasHydrated: false,
       setHasHydrated: (hydrated) => set({ _hasHydrated: hydrated }),
       setAuth: (user, token) => {
-        set({ user, token })
+        // Validar antes de salvar
+        if (user && token) {
+          set({ user, token })
+        } else {
+          console.error('[AUTH STORE] Tentativa de setAuth com dados inválidos:', {
+            hasUser: !!user,
+            hasToken: !!token,
+          })
+        }
       },
       clearAuth: () => {
         set({ user: null, token: null })
@@ -116,17 +94,57 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
-      storage: createJSONStorage(() => createResilientStorage()),
+      storage: createJSONStorage(() => createValidatedStorage()),
       partialize: (state) => ({
         user: state.user,
         token: state.token,
       }),
       onRehydrateStorage: () => {
         return (state) => {
-          state?.setHasHydrated(true)
+          // Validar estado após hydration
+          if (state) {
+            const hasValidAuth = state.user && state.token
+
+            if (hasValidAuth) {
+              console.log('[AUTH STORE] Hydration bem-sucedida com auth válido')
+            } else {
+              // IMPORTANTE: Durante HMR, o state pode estar temporariamente inválido
+              // MAS o localStorage pode ainda ter dados válidos que foram bloqueados
+              // Verificar localStorage antes de limpar
+              if (typeof window !== 'undefined') {
+                try {
+                  const authStorage = localStorage.getItem('auth-storage')
+                  if (authStorage) {
+                    const { state: storedState } = JSON.parse(authStorage)
+                    if (storedState?.user && storedState?.token) {
+                      console.log(
+                        '[AUTH STORE] Hydration com state inválido MAS localStorage válido - restaurando'
+                      )
+                      // Restaurar do localStorage
+                      state.user = storedState.user
+                      state.token = storedState.token
+                      state.setHasHydrated(true)
+                      return // NÃO limpar
+                    }
+                  }
+                } catch (error) {
+                  console.error('[AUTH STORE] Erro ao verificar localStorage:', error)
+                }
+              }
+
+              // Só limpar se localStorage também está inválido
+              console.warn(
+                '[AUTH STORE] Hydration com auth inválido E localStorage inválido, limpando...'
+              )
+              state.clearAuth()
+            }
+            state.setHasHydrated(true)
+          }
         }
       },
       skipHydration: false,
+      // CRÍTICO: Versão do storage para forçar invalidação em caso de mudanças
+      version: 1,
     }
   )
 )

@@ -39,6 +39,7 @@ export default function LeaseDetailsPage() {
   const id = params.id as string
 
   const { data: lease, isLoading, error, refetch } = useLease(id)
+  // Reabilitado com retry automático para lidar com 401 temporário do backend
   const { data: payments, isLoading: paymentsLoading } = useLeasePayments(id)
   const cancelLease = useCancelLease()
   const renewLease = useRenewLease()

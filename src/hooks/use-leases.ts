@@ -11,6 +11,8 @@ import { toast } from 'sonner'
 
 /**
  * Hook para buscar lista de contratos com filtros opcionais
+ * IMPORTANTE: Não usamos enabled com token check porque isso pode causar
+ * race conditions durante HMR. O axios interceptor já valida o token.
  */
 export function useLeases(params?: { status?: string; unit_id?: string; tenant_id?: string }) {
   return useQuery<Lease[]>({
@@ -27,18 +29,24 @@ export function useLease(id: string) {
   return useQuery<Lease>({
     queryKey: ['leases', id],
     queryFn: () => leasesService.getLease(id),
-    enabled: !!id,
+    enabled: !!id, // Apenas verificar se tem ID
   })
 }
 
 /**
  * Hook para buscar estatísticas de contratos
+ * Query opcional: falhas não devem quebrar a página
  */
 export function useLeaseStats() {
   return useQuery<LeaseStats>({
     queryKey: ['leases', 'stats'],
     queryFn: () => leasesService.getLeaseStats(),
     staleTime: 5 * 60 * 1000, // 5 minutos
+    // Configurações específicas para query opcional
+    retry: 1, // Apenas 1 retry
+    retryDelay: 1000, // 1 segundo entre retries
+    // Se falhar, não propagar erro - apenas retornar undefined
+    throwOnError: false,
   })
 }
 
@@ -60,7 +68,7 @@ export function useLeasePayments(leaseId: string) {
   return useQuery<Payment[]>({
     queryKey: ['leases', leaseId, 'payments'],
     queryFn: () => leasesService.getLeasePayments(leaseId),
-    enabled: !!leaseId,
+    enabled: !!leaseId, // Apenas verificar se tem leaseId
     staleTime: 2 * 60 * 1000, // 2 minutos (pagamentos mudam com frequência)
   })
 }

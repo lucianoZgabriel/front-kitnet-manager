@@ -13,22 +13,9 @@ export const tenantFormSchema = z.object({
       message: 'CPF inválido. Use o formato: XXX.XXX.XXX-XX',
     }),
   phone: z.string().min(1, 'Telefone é obrigatório').max(20, 'Telefone muito longo'),
-  email: z
-    .string()
-    .email('Email inválido')
-    .optional()
-    .or(z.literal(''))
-    .transform((val) => (val === '' ? undefined : val)),
-  id_document_type: z
-    .string()
-    .optional()
-    .or(z.literal(''))
-    .transform((val) => (val === '' ? undefined : val)),
-  id_document_number: z
-    .string()
-    .optional()
-    .or(z.literal(''))
-    .transform((val) => (val === '' ? undefined : val)),
+  email: z.string().email('Email inválido').or(z.literal('')).optional(),
+  id_document_type: z.string().optional(),
+  id_document_number: z.string().optional(),
 })
 
 /**

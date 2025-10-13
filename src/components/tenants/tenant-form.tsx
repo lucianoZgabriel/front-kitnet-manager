@@ -15,11 +15,7 @@ import {
 } from '@/src/components/ui/form'
 import { Input } from '@/src/components/ui/input'
 import { LoadingSpinner } from '@/src/components/shared/loading-spinner'
-import {
-  tenantFormSchema,
-  type TenantFormData,
-  type UpdateTenantFormData,
-} from '@/src/lib/validations/tenant'
+import { tenantFormSchema, type TenantFormData } from '@/src/lib/validations/tenant'
 import { useCreateTenant, useUpdateTenant } from '@/src/hooks/use-tenants'
 import type { Tenant } from '@/src/types/api/tenant'
 import { formatCPF, formatPhone } from '@/src/lib/utils/format'
@@ -52,16 +48,21 @@ export function TenantForm({ tenant, mode }: TenantFormProps) {
   const onSubmit = async (data: TenantFormData) => {
     try {
       if (mode === 'create') {
-        const createData = data as TenantFormData
-        await createTenant.mutateAsync(createData)
+        await createTenant.mutateAsync(data)
         router.push('/tenants')
       } else if (tenant) {
-        const updateData = data as UpdateTenantFormData
+        // No modo edição, enviamos apenas os campos que podem ser atualizados (sem CPF)
         await updateTenant.mutateAsync({
           id: tenant.id,
-          data: updateData,
+          data: {
+            full_name: data.full_name,
+            phone: data.phone,
+            email: data.email,
+            id_document_type: data.id_document_type,
+            id_document_number: data.id_document_number,
+          },
         })
-        router.push(`/tenants/${tenant.id}`)
+        router.push('/tenants')
       }
     } catch (error) {
       console.error('Error submitting form:', error)
@@ -111,7 +112,8 @@ export function TenantForm({ tenant, mode }: TenantFormProps) {
                     />
                   </FormControl>
                   <FormDescription>
-                    CPF no formato XXX.XXX.XXX-XX (não pode ser alterado depois)
+                    CPF no formato XXX.XXX.XXX-XX (verifique cuidadosamente - não pode ser alterado
+                    depois)
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -124,9 +126,12 @@ export function TenantForm({ tenant, mode }: TenantFormProps) {
             <FormItem>
               <FormLabel>CPF</FormLabel>
               <FormControl>
-                <Input value={formatCPF(tenant.cpf)} disabled />
+                <Input value={formatCPF(tenant.cpf)} disabled className="bg-muted" />
               </FormControl>
-              <FormDescription>CPF não pode ser alterado</FormDescription>
+              <FormDescription className="text-amber-600">
+                ⚠️ CPF não pode ser alterado (limitação da API). Se houver erro de digitação, será
+                necessário criar um novo cadastro.
+              </FormDescription>
             </FormItem>
           )}
 

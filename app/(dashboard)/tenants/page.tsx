@@ -7,7 +7,7 @@ import { LoadingSpinner } from '@/src/components/shared/loading-spinner'
 import { ErrorMessage } from '@/src/components/shared/error-message'
 import { Button } from '@/src/components/ui/button'
 import { Input } from '@/src/components/ui/input'
-import { Plus, Search } from 'lucide-react'
+import { Plus, Search, Eye, Edit } from 'lucide-react'
 import { formatCPF, formatPhone } from '@/src/lib/utils/format'
 import { Card } from '@/src/components/ui/card'
 
@@ -115,9 +115,18 @@ export default function TenantsPage() {
                       {tenant.email || '-'}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <Button variant="ghost" size="sm" asChild>
-                        <Link href={`/tenants/${tenant.id}`}>Ver detalhes</Link>
-                      </Button>
+                      <div className="flex justify-end gap-2">
+                        <Button variant="ghost" size="sm" asChild>
+                          <Link href={`/tenants/${tenant.id}`}>
+                            <Eye className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                        <Button variant="ghost" size="sm" asChild>
+                          <Link href={`/tenants/${tenant.id}?edit=true`}>
+                            <Edit className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 ))

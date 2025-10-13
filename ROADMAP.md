@@ -205,7 +205,7 @@ Roadmap completo para desenvolvimento do frontend do Kitnet Manager, organizado 
 
 ---
 
-## Sprint 3: Tenants (Semana 4)
+## Sprint 3: Tenants (Semana 4) ✅
 
 ### Objetivos
 - CRUD completo de Inquilinos
@@ -215,39 +215,60 @@ Roadmap completo para desenvolvimento do frontend do Kitnet Manager, organizado 
 ### Tarefas
 
 #### Tenants - Listagem
-- [ ] Criar `useTenants` query com busca
-- [ ] Página de listagem (`app/(dashboard)/tenants/page.tsx`)
-- [ ] TenantsTable component
-- [ ] Busca por nome ou CPF
-- [ ] TenantCard component
+- [x] Criar `useTenants` query com busca
+- [x] Página de listagem (`app/(dashboard)/tenants/page.tsx`)
+- [x] TenantsTable component (implementado direto na página)
+- [x] Busca por nome ou CPF
+- [x] Ícones Eye e Edit para ações rápidas
+- [ ] TenantCard component - **Não implementado (não necessário)**
 
 #### Tenants - Criação
-- [ ] Schema Zod para tenant form (validação CPF)
-- [ ] Criar `useCreateTenant` mutation
-- [ ] Página de criação (`app/(dashboard)/tenants/new/page.tsx`)
-- [ ] TenantForm component
-- [ ] CPFInput component com máscara
-- [ ] Validação de CPF único (error handling)
+- [x] Schema Zod para tenant form (validação CPF)
+- [x] Criar `useCreateTenant` mutation
+- [x] Página de criação (`app/(dashboard)/tenants/new/page.tsx`)
+- [x] TenantForm component (reutilizável create/edit)
+- [x] Formatação automática de CPF (integrada no Input)
+- [x] Formatação automática de telefone
+- [x] Validação de CPF único (error handling)
 
 #### Tenants - Detalhes/Edição
-- [ ] Criar `useTenant` query (by ID)
-- [ ] Criar `useTenantByCPF` query
-- [ ] Criar `useUpdateTenant` mutation
-- [ ] Criar `useDeleteTenant` mutation
-- [ ] Página de detalhes (`app/(dashboard)/tenants/[id]/page.tsx`)
-- [ ] Mostrar histórico de contratos
-- [ ] Mostrar contrato ativo (se houver)
+- [x] Criar `useTenant` query (by ID)
+- [x] Criar `useTenantByCPF` query
+- [x] Criar `useUpdateTenant` mutation
+- [x] Criar `useDeleteTenant` mutation
+- [x] Página de detalhes (`app/(dashboard)/tenants/[id]/page.tsx`)
+- [x] Modo visualização com cards informativos
+- [x] Modo edição inline (toggle)
+- [x] CPF readonly com aviso sobre limitação da API
+- [x] Email clicável (mailto link)
+- [ ] Mostrar histórico de contratos - **Depende da Sprint 4 (Leases)**
+- [ ] Mostrar contrato ativo (se houver) - **Depende da Sprint 4 (Leases)**
 
 #### Utilities
-- [ ] Função `formatCPF` (XXX.XXX.XXX-XX)
-- [ ] Função `validateCPF` (regex + dígitos)
-- [ ] Máscara de telefone
+- [x] Função `formatCPF` (XXX.XXX.XXX-XX) - já existia
+- [x] Função `validateCPF` (regex + dígitos) - criada
+- [x] Função `formatPhone` (máscara de telefone) - já existia
 
 ### Entregáveis
-✅ CRUD completo de inquilinos
-✅ Validação de CPF funcionando
-✅ Busca por nome/CPF
-✅ Histórico de contratos visível
+✅ CRUD completo de inquilinos (criar, listar, visualizar, editar, deletar)
+✅ Validação de CPF funcionando (formato e dígitos)
+✅ Busca por nome/CPF em tempo real
+✅ Formatação automática de CPF e telefone ao digitar
+✅ Ícones Eye e Edit na listagem para ações rápidas
+✅ Modo visualização/edição inline
+✅ Email clicável (mailto link)
+✅ CPF readonly com aviso claro sobre limitação da API
+✅ Loading states e error handling robusto
+✅ Toast notifications (sucesso/erro)
+✅ UI responsiva e polida (mobile, tablet, desktop)
+
+**Concluído em:** 13/01/2025
+**Branch:** feature/sprint3-tenants
+**Commits:**
+- d6506fc feat: implement tenants listing page with search
+- 473a47c feat: implement tenant creation page with form validation
+- b1f4997 feat: implement tenant details and edit page
+- 8107818 fix: improve tenant UX with view/edit icons and better CPF handling
 
 ---
 
@@ -640,7 +661,7 @@ Roadmap completo para desenvolvimento do frontend do Kitnet Manager, organizado 
 Semana 1: [████████████████████████] Setup & Foundation ✅
 Semana 2: [████████████████████████] Auth & Layout ✅
 Semana 3: [████████████████████████] Dashboard & Units ✅
-Semana 4: [------------------------] Tenants
+Semana 4: [████████████████████████] Tenants ✅
 Semana 5: [------------------------] Leases
 Semana 6: [------------------------] Payments
 Semana 7: [------------------------] Reports & Advanced
@@ -650,7 +671,7 @@ Semana 10: [------------------------] Production Ready
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          MVP Core Features  │  Advanced  │  Launch
-             (30% ✅)        │            │
+             (40% ✅)        │            │
 ```
 
 ---

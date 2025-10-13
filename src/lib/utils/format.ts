@@ -24,6 +24,23 @@ export function formatCurrency(value: string | number): string {
 }
 
 /**
+ * Valida CPF (formato e dígitos)
+ * @param cpf - CPF em qualquer formato
+ * @returns true se válido
+ */
+export function validateCPF(cpf: string): boolean {
+  const numbers = cpf.replace(/\D/g, '')
+
+  // Verifica se tem 11 dígitos
+  if (numbers.length !== 11) return false
+
+  // Verifica se todos os dígitos são iguais (ex: 111.111.111-11)
+  if (/^(\d)\1{10}$/.test(numbers)) return false
+
+  return true
+}
+
+/**
  * Formata CPF para formato XXX.XXX.XXX-XX
  * @param cpf - CPF em qualquer formato
  * @returns CPF formatado ou string vazia se inválido

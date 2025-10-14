@@ -99,3 +99,52 @@ export function formatDateTime(date: string | Date): string {
 export function formatDateISO(date: Date): string {
   return dateFnsFormat(date, 'yyyy-MM-dd')
 }
+
+/**
+ * Calcula multa por atraso no pagamento
+ * Business Rule:
+ * - 2% de multa fixa sobre o valor
+ * - 1% de juros ao mês (pro-rata diário)
+ *
+ * @param amount - Valor original do pagamento (string ou número)
+ * @param daysOverdue - Dias de atraso
+ * @returns Objeto com valores calculados
+ */
+export function calculateLateFee(
+  amount: string | number,
+  daysOverdue: number
+): {
+  amount: number
+  penalty: number
+  interest: number
+  total: number
+} {
+  const amountNum = typeof amount === 'string' ? parseFloat(amount) : amount
+
+  // Sem atraso = sem multa
+  if (daysOverdue <= 0) {
+    return {
+      amount: amountNum,
+      penalty: 0,
+      interest: 0,
+      total: amountNum,
+    }
+  }
+
+  // Multa de 2%
+  const penalty = amountNum * 0.02
+
+  // Juros de 1% ao mês (pro-rata diário)
+  const dailyInterestRate = 0.01 / 30
+  const interest = amountNum * dailyInterestRate * daysOverdue
+
+  // Total com multa e juros
+  const total = amountNum + penalty + interest
+
+  return {
+    amount: amountNum,
+    penalty: Math.round(penalty * 100) / 100, // Arredondar para 2 casas decimais
+    interest: Math.round(interest * 100) / 100,
+    total: Math.round(total * 100) / 100,
+  }
+}

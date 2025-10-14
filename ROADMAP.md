@@ -358,7 +358,7 @@ Roadmap completo para desenvolvimento do frontend do Kitnet Manager, organizado 
 
 ---
 
-## Sprint 5: Payments (Semana 6)
+## Sprint 5: Payments (Semana 6) ✅
 
 ### Objetivos
 - Visualização de pagamentos
@@ -369,43 +369,55 @@ Roadmap completo para desenvolvimento do frontend do Kitnet Manager, organizado 
 ### Tarefas
 
 #### Payments - Por Contrato
-- [ ] Criar `useLeasePayments` query
-- [ ] Página de pagamentos (`app/(dashboard)/leases/[id]/payments/page.tsx`)
-- [ ] PaymentsTable component
-- [ ] PaymentStatusBadge component
-- [ ] Filtros: status, tipo, período
+- [x] Criar `useLeasePayments` query
+- [x] Página de pagamentos (`app/(dashboard)/leases/[id]/payments/page.tsx`)
+- [x] PaymentsTable component (implementado inline na página)
+- [x] PaymentStatusBadge component
+- [x] Filtros: status, tipo, período
 
 #### Payments - Marcar como Pago
-- [ ] Criar `usePayPayment` mutation
-- [ ] PayPaymentDialog component
-- [ ] Campos: data de pagamento, método
-- [ ] Auto-preencher data atual
-- [ ] Mostrar valor original vs com multa
+- [x] Criar `useMarkPaymentAsPaid` mutation
+- [x] PayPaymentDialog component
+- [x] Campos: data de pagamento, método
+- [x] Auto-preencher data atual
+- [x] Mostrar valor original vs com multa
 
 #### Payments - Atrasados
-- [ ] Criar `useOverduePayments` query
-- [ ] Página de atrasados (`app/(dashboard)/payments/overdue/page.tsx`)
-- [ ] Destacar dias de atraso
-- [ ] Mostrar valor da multa calculada
-- [ ] Botão rápido para marcar como pago
+- [x] Criar `useOverduePayments` query
+- [x] Página de atrasados (`app/(dashboard)/payments/overdue/page.tsx`)
+- [x] Destacar dias de atraso
+- [x] Mostrar valor da multa calculada
+- [x] Botão rápido para marcar como pago
 
 #### Payments - Próximos Vencimentos
-- [ ] Criar `useUpcomingPayments` query
-- [ ] Página de upcoming (`app/(dashboard)/payments/upcoming/page.tsx`)
-- [ ] Filtro por dias (7, 15, 30)
-- [ ] Ordenar por data de vencimento
-- [ ] Agrupar por semana/mês
+- [x] Criar `useUpcomingPayments` query
+- [x] Página de upcoming (`app/(dashboard)/payments/upcoming/page.tsx`)
+- [x] Filtro por dias (7, 15, 30, 60)
+- [x] Ordenar por data de vencimento
+- [x] Agrupar por período (Hoje, Esta Semana, Depois)
 
 #### Payments - Estatísticas
-- [ ] Criar `usePaymentStats` query (por lease)
-- [ ] Componente de estatísticas do contrato
-- [ ] Pagamentos em dia vs atrasados
-- [ ] Total pago vs total esperado
+- [x] Criar `usePaymentStats` query (por lease)
+- [x] Componente de estatísticas do contrato
+- [x] Pagamentos em dia vs atrasados
+- [x] Total pago vs total esperado
+
+#### Payments - Cancelamento
+- [x] Criar `useCancelPayment` mutation
+- [x] Botão de cancelar em todas as páginas de pagamentos
+- [x] ConfirmDialog para cancelamento
+- [x] Apenas para pagamentos pending/overdue
 
 #### Utilities
-- [ ] Função `calculateLateFee` (2% + 1%/mês pro-rata)
-- [ ] Função `formatCurrency` (R$ 1.000,00)
-- [ ] CurrencyInput component com máscara
+- [x] Função `calculateLateFee` (2% + 1%/mês pro-rata)
+- [x] Função `formatCurrency` (R$ 1.000,00) - já existia
+- [ ] CurrencyInput component com máscara - **Não implementado (não necessário)**
+
+#### Extras Implementados
+- [x] Página principal de pagamentos (`app/(dashboard)/payments/page.tsx`)
+- [x] Dashboard com resumo de atrasados e próximos vencimentos
+- [x] Integração completa com API backend
+- [x] Modo escuro desabilitado (forçado light mode)
 
 ### Entregáveis
 ✅ Visualização completa de pagamentos
@@ -413,6 +425,16 @@ Roadmap completo para desenvolvimento do frontend do Kitnet Manager, organizado 
 ✅ Dashboard de atrasados
 ✅ Dashboard de próximos vencimentos
 ✅ Cálculo de multas correto
+✅ Cancelamento de pagamentos
+✅ Filtros avançados (status, tipo, período)
+✅ Estatísticas por contrato
+✅ UI responsiva e polida
+
+**Concluído em:** 14/10/2025
+**Branch:** feature/sprint5-payments
+**Commits:**
+- 951de34 feat: implement Sprint 5 - Payments module with full CRUD functionality
+- 898b81e feat: add payment cancellation feature and force light mode
 
 ---
 
@@ -681,7 +703,7 @@ Semana 2: [███████████████████████
 Semana 3: [████████████████████████] Dashboard & Units ✅
 Semana 4: [████████████████████████] Tenants ✅
 Semana 5: [████████████████████████] Leases ✅
-Semana 6: [------------------------] Payments
+Semana 6: [████████████████████████] Payments ✅
 Semana 7: [------------------------] Reports & Advanced
 Semana 8: [------------------------] Settings & Users
 Semana 9: [------------------------] Polish & Testing
@@ -689,7 +711,7 @@ Semana 10: [------------------------] Production Ready
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          MVP Core Features  │  Advanced  │  Launch
-             (50% ✅)        │            │
+             (60% ✅)        │            │
 ```
 
 ---

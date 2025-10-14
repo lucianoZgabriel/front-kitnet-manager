@@ -40,9 +40,9 @@ export interface UpdatePaintingFeePaidRequest {
 }
 
 export interface LeaseStats {
-  total_leases: number
-  active_leases: number
-  expiring_soon_leases: number
-  expired_leases: number
-  cancelled_leases: number
+  total: number
+  active: number
+  expiring_soon: number
+  expired: number
+  cancelled: number
 }

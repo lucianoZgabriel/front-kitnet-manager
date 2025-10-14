@@ -14,12 +14,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
+  // Redirecionar para login se não autenticado
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.push('/login')
     }
   }, [isAuthenticated, isLoading, router])
 
+  // Mostrar loading enquanto carrega
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -31,6 +33,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     )
   }
 
+  // Se não está autenticado, mostrar nada (vai redirecionar)
   if (!isAuthenticated) {
     return null
   }

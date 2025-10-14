@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useUnit, useDeleteUnit, useUpdateUnitStatus } from '@/src/hooks/use-units'
+import { useLeases } from '@/src/hooks/use-leases'
+import { LeaseStatusBadge } from '@/src/components/leases/lease-status-badge'
 import { UnitForm } from '@/src/components/units/unit-form'
 import { UnitStatusBadge } from '@/src/components/units/unit-status-badge'
 import { LoadingSpinner } from '@/src/components/shared/loading-spinner'
@@ -19,7 +21,7 @@ import {
   SelectValue,
 } from '@/src/components/ui/select'
 import { ArrowLeft, Edit, Trash2, X } from 'lucide-react'
-import { formatCurrency, formatDateTime } from '@/src/lib/utils/format'
+import { formatCurrency, formatDateTime, formatDate } from '@/src/lib/utils/format'
 import type { UnitStatus } from '@/src/types/api/unit'
 
 export default function UnitDetailsPage() {
@@ -29,6 +31,7 @@ export default function UnitDetailsPage() {
   const id = params.id as string
 
   const { data: unit, isLoading, error, refetch } = useUnit(id)
+  const { data: leases } = useLeases({ unit_id: id })
   const deleteUnit = useDeleteUnit()
   const updateStatus = useUpdateUnitStatus()
 
@@ -236,6 +239,56 @@ export default function UnitDetailsPage() {
               </CardContent>
             </Card>
           )}
+
+          {/* Contratos */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Histórico de Contratos</CardTitle>
+              <CardDescription>Contratos de locação associados a esta unidade</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {leases && leases.length > 0 ? (
+                <div className="space-y-4">
+                  {leases.map((lease) => (
+                    <Link
+                      key={lease.id}
+                      href={`/leases/${lease.id}`}
+                      className="hover:bg-muted/50 block rounded-lg border p-4 transition-colors"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <LeaseStatusBadge status={lease.status} />
+                            <p className="text-sm font-medium">
+                              {formatDate(lease.start_date)} até {formatDate(lease.end_date)}
+                            </p>
+                          </div>
+                          <p className="text-muted-foreground text-sm">
+                            Aluguel: {formatCurrency(parseFloat(lease.monthly_rent_value))} •
+                            Vencimento: dia {lease.payment_due_day}
+                          </p>
+                        </div>
+                        <Button variant="ghost" size="sm">
+                          Ver Detalhes
+                        </Button>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="py-6 text-center">
+                  <p className="text-muted-foreground text-sm">
+                    Nenhum contrato encontrado para esta unidade
+                  </p>
+                  {unit.status === 'available' && (
+                    <Button asChild variant="outline" size="sm" className="mt-2">
+                      <Link href="/leases/new">Criar Contrato</Link>
+                    </Button>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Informações do Sistema */}
           <Card>

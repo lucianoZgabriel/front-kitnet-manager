@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { clearAuth as clearAuthStore } from '@/src/lib/stores/auth-store'
 
 export const api = axios.create({
   baseURL:
@@ -9,10 +10,13 @@ export const api = axios.create({
   timeout: 30000,
 })
 
+// Flag para prevenir múltiplos logouts simultâneos
+let isLoggingOut = false
+
 // Request interceptor - adiciona Bearer token
 api.interceptors.request.use(
   (config) => {
-    // Pegar token do localStorage (será implementado com auth store)
+    // Pegar token do localStorage
     if (typeof window !== 'undefined') {
       const authStorage = localStorage.getItem('auth-storage')
       if (authStorage) {
@@ -22,7 +26,7 @@ api.interceptors.request.use(
             config.headers.Authorization = `Bearer ${state.token}`
           }
         } catch (error) {
-          console.error('Error parsing auth storage:', error)
+          console.error('[AUTH] Error parsing auth storage:', error)
         }
       }
     }
@@ -41,13 +45,23 @@ api.interceptors.response.use(
     return response.data
   },
   (error) => {
-    // Se 401, limpar auth e redirecionar para login
+    // IMPORTANTE: Apenas fazer logout em 401 (Unauthorized)
+    // Erros 500 (Internal Server Error) NÃO devem causar logout!
+    // Usar flag para prevenir múltiplos logouts simultâneos (race condition)
     if (error.response?.status === 401) {
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('auth-storage')
-        // Não redirecionar se já estiver na página de login
+      if (typeof window !== 'undefined' && !isLoggingOut) {
+        isLoggingOut = true
+
+        // Limpar autenticação e redirecionar para login
+        clearAuthStore()
+
         if (!window.location.pathname.includes('/login')) {
-          window.location.href = '/login'
+          setTimeout(() => {
+            window.location.href = '/login'
+            isLoggingOut = false
+          }, 100)
+        } else {
+          isLoggingOut = false
         }
       }
     }

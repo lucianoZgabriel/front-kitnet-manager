@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react'
 import { useAuthStore } from '@/src/lib/stores/auth-store'
 import { authService } from '@/src/lib/api/auth.service'
 import type { User, LoginRequest } from '@/src/types/api/auth'
@@ -23,61 +23,79 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const { user, token, setAuth, clearAuth } = useAuthStore()
+  const { user, token, _hasHydrated, setAuth, clearAuth } = useAuthStore()
   const [isLoading, setIsLoading] = useState(true)
+  const [hasInitialized, setHasInitialized] = useState(false)
 
-  // Verificar se h� token ao carregar e buscar dados do usu�rio
+  // Aguardar hidratação do Zustand antes de inicializar
   useEffect(() => {
+    // Só executar UMA VEZ após a hidratação completar
+    if (!_hasHydrated || hasInitialized) {
+      return
+    }
+
     const initializeAuth = async () => {
       if (token) {
         try {
           const response = await authService.getCurrentUser()
           if (response.success && response.data) {
             setAuth(response.data, token)
-          } else {
-            clearAuth()
           }
-        } catch (error) {
-          console.error('Failed to fetch user data:', error)
-          clearAuth()
+          // Se falhar, não fazer nada - manter dados em cache
+        } catch {
+          // NÃO limpar auth automaticamente - pode ser erro temporário (500, network, etc)
+          // Se for 401, o interceptor do axios já vai redirecionar
+        } finally {
+          // SEMPRE setar isLoading = false DEPOIS da API call completar
+          setIsLoading(false)
+          setHasInitialized(true)
         }
+      } else {
+        setIsLoading(false)
+        setHasInitialized(true)
       }
-      setIsLoading(false)
     }
 
     initializeAuth()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []) // Executar apenas na montagem inicial
+  }, [_hasHydrated])
 
-  const login = async (credentials: LoginRequest) => {
-    try {
-      setIsLoading(true)
-      const response = await authService.login(credentials)
+  const login = useCallback(
+    async (credentials: LoginRequest) => {
+      try {
+        setIsLoading(true)
 
-      if (response.success && response.data) {
-        const { user: userData, token: userToken } = response.data
-        setAuth(userData, userToken)
-        toast.success(response.message || 'Login realizado com sucesso!')
-      } else {
-        throw new Error(response.error || 'Falha no login')
+        // CRÍTICO: Limpar qualquer estado corrompido antes de fazer login
+        clearAuth()
+
+        const response = await authService.login(credentials)
+
+        if (response.success && response.data) {
+          const { user: userData, token: userToken } = response.data
+          setAuth(userData, userToken)
+          toast.success(response.message || 'Login realizado com sucesso!')
+        } else {
+          throw new Error(response.error || 'Falha no login')
+        }
+      } catch (error: unknown) {
+        const errorMessage =
+          (error as { message?: string })?.message ||
+          'Erro ao fazer login. Verifique suas credenciais.'
+        toast.error(errorMessage)
+        throw error
+      } finally {
+        setIsLoading(false)
       }
-    } catch (error: unknown) {
-      const errorMessage =
-        (error as { message?: string })?.message ||
-        'Erro ao fazer login. Verifique suas credenciais.'
-      toast.error(errorMessage)
-      throw error
-    } finally {
-      setIsLoading(false)
-    }
-  }
+    },
+    [setAuth, clearAuth]
+  )
 
-  const logout = () => {
+  const logout = useCallback(() => {
     clearAuth()
     toast.success('Logout realizado com sucesso!')
-  }
+  }, [clearAuth])
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     if (!token) return
 
     try {
@@ -85,21 +103,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (response.success && response.data) {
         setAuth(response.data, token)
       }
-    } catch (error) {
-      console.error('Failed to refresh user data:', error)
-      clearAuth()
+      // Se falhar, não fazer nada - manter dados em cache
+    } catch {
+      // NÃO limpar auth - manter dados em cache
+      // Se for 401, o interceptor do axios já vai redirecionar
     }
-  }
+  }, [token, setAuth])
 
-  const value: AuthContextType = {
-    user,
-    token,
-    isLoading,
-    isAuthenticated: !!user && !!token,
-    login,
-    logout,
-    refreshUser,
-  }
+  const value: AuthContextType = useMemo(
+    () => ({
+      user,
+      token,
+      isLoading,
+      isAuthenticated: !!user && !!token,
+      login,
+      logout,
+      refreshUser,
+    }),
+    [user, token, isLoading, login, logout, refreshUser]
+  )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

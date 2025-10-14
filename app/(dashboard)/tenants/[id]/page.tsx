@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useTenant, useDeleteTenant } from '@/src/hooks/use-tenants'
+import { useLeases } from '@/src/hooks/use-leases'
+import { LeaseStatusBadge } from '@/src/components/leases/lease-status-badge'
 import { TenantForm } from '@/src/components/tenants/tenant-form'
 import { LoadingSpinner } from '@/src/components/shared/loading-spinner'
 import { ErrorMessage } from '@/src/components/shared/error-message'
@@ -11,7 +13,13 @@ import { ConfirmDialog } from '@/src/components/shared/confirm-dialog'
 import { Button } from '@/src/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/components/ui/card'
 import { ArrowLeft, Edit, Trash2, X } from 'lucide-react'
-import { formatCPF, formatPhone, formatDateTime } from '@/src/lib/utils/format'
+import {
+  formatCPF,
+  formatPhone,
+  formatDateTime,
+  formatDate,
+  formatCurrency,
+} from '@/src/lib/utils/format'
 
 export default function TenantDetailsPage() {
   const params = useParams()
@@ -20,6 +28,7 @@ export default function TenantDetailsPage() {
   const id = params.id as string
 
   const { data: tenant, isLoading, error, refetch } = useTenant(id)
+  const { data: leases } = useLeases({ tenant_id: id })
   const deleteTenant = useDeleteTenant()
 
   const [isEditing, setIsEditing] = useState(false)
@@ -183,16 +192,51 @@ export default function TenantDetailsPage() {
             </Card>
           )}
 
-          {/* Contratos - TODO: Implementar na Sprint 4 */}
+          {/* Contratos */}
           <Card>
             <CardHeader>
-              <CardTitle>Contratos</CardTitle>
-              <CardDescription>Histórico de contratos do inquilino</CardDescription>
+              <CardTitle>Histórico de Contratos</CardTitle>
+              <CardDescription>Contratos de locação associados a este inquilino</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground py-8 text-center">
-                Histórico de contratos será implementado na Sprint 4 (Leases)
-              </p>
+              {leases && leases.length > 0 ? (
+                <div className="space-y-4">
+                  {leases.map((lease) => (
+                    <Link
+                      key={lease.id}
+                      href={`/leases/${lease.id}`}
+                      className="hover:bg-muted/50 block rounded-lg border p-4 transition-colors"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <LeaseStatusBadge status={lease.status} />
+                            <p className="text-sm font-medium">
+                              {formatDate(lease.start_date)} até {formatDate(lease.end_date)}
+                            </p>
+                          </div>
+                          <p className="text-muted-foreground text-sm">
+                            Aluguel: {formatCurrency(parseFloat(lease.monthly_rent_value))} •
+                            Vencimento: dia {lease.payment_due_day}
+                          </p>
+                        </div>
+                        <Button variant="ghost" size="sm">
+                          Ver Detalhes
+                        </Button>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="py-6 text-center">
+                  <p className="text-muted-foreground text-sm">
+                    Nenhum contrato encontrado para este inquilino
+                  </p>
+                  <Button asChild variant="outline" size="sm" className="mt-2">
+                    <Link href="/leases/new">Criar Contrato</Link>
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
 

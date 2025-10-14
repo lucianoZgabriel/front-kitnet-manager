@@ -74,21 +74,47 @@ export function formatPhone(phone: string): string {
 /**
  * Formata data ISO para formato brasileiro DD/MM/YYYY
  * @param date - Data em formato ISO (YYYY-MM-DD) ou Date object
- * @returns Data formatada como "DD/MM/YYYY"
+ * @returns Data formatada como "DD/MM/YYYY" ou "-" se data inválida
  */
-export function formatDate(date: string | Date): string {
-  const dateObj = typeof date === 'string' ? parseISO(date) : date
-  return dateFnsFormat(dateObj, 'dd/MM/yyyy', { locale: ptBR })
+export function formatDate(date: string | Date | null | undefined): string {
+  if (!date) return '-'
+
+  try {
+    const dateObj = typeof date === 'string' ? parseISO(date) : date
+    const formatted = dateFnsFormat(dateObj, 'dd/MM/yyyy', { locale: ptBR })
+
+    // Verifica se a data é válida
+    if (formatted === 'Invalid Date' || isNaN(dateObj.getTime())) {
+      return '-'
+    }
+
+    return formatted
+  } catch {
+    return '-'
+  }
 }
 
 /**
  * Formata data ISO para formato brasileiro com hora DD/MM/YYYY HH:mm
  * @param date - Data em formato ISO ou Date object
- * @returns Data formatada como "DD/MM/YYYY HH:mm"
+ * @returns Data formatada como "DD/MM/YYYY HH:mm" ou "-" se data inválida
  */
-export function formatDateTime(date: string | Date): string {
-  const dateObj = typeof date === 'string' ? parseISO(date) : date
-  return dateFnsFormat(dateObj, 'dd/MM/yyyy HH:mm', { locale: ptBR })
+export function formatDateTime(date: string | Date | null | undefined): string {
+  if (!date) return '-'
+
+  try {
+    const dateObj = typeof date === 'string' ? parseISO(date) : date
+    const formatted = dateFnsFormat(dateObj, 'dd/MM/yyyy HH:mm', { locale: ptBR })
+
+    // Verifica se a data é válida
+    if (formatted === 'Invalid Date' || isNaN(dateObj.getTime())) {
+      return '-'
+    }
+
+    return formatted
+  } catch {
+    return '-'
+  }
 }
 
 /**

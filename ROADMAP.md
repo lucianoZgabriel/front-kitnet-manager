@@ -438,7 +438,7 @@ Roadmap completo para desenvolvimento do frontend do Kitnet Manager, organizado 
 
 ---
 
-## Sprint 6: Reports & Advanced Features (Semana 7)
+## Sprint 6: Reports & Advanced Features (Semana 7) ✅
 
 ### Objetivos
 - Relatórios financeiros
@@ -449,35 +449,52 @@ Roadmap completo para desenvolvimento do frontend do Kitnet Manager, organizado 
 ### Tarefas
 
 #### Reports - Financial
-- [ ] Criar `useFinancialReport` query
-- [ ] Página de relatório (`app/(dashboard)/reports/financial/page.tsx`)
-- [ ] Filtros de período (date range picker)
-- [ ] Filtros de tipo e status
-- [ ] Tabela de resultados
-- [ ] Totalizadores
+- [x] Criar `useFinancialReport` query
+- [x] Página de relatório (`app/(dashboard)/reports/financial/page.tsx`)
+- [x] Filtros de período (date range picker)
+- [x] Filtros de tipo e status
+- [x] Tabela de resultados
+- [x] Totalizadores
 
 #### Reports - Payments
-- [ ] Criar `usePaymentsReport` query
-- [ ] Página de relatório (`app/(dashboard)/reports/payments/page.tsx`)
-- [ ] Filtros avançados
-- [ ] Visualização por contrato
-- [ ] Totalizadores por método de pagamento
+- [x] Criar `usePaymentHistory` query
+- [x] Página de relatório (`app/(dashboard)/reports/payments/page.tsx`)
+- [x] Filtros avançados (contrato, inquilino, status, período)
+- [x] Visualização por contrato
+- [x] Totalizadores por status de pagamento
 
 #### Components
-- [ ] DateRangePicker component (shadcn calendar)
-- [ ] DataTable genérica com filtros
-- [ ] ExportButton (preparar para futuro)
+- [x] DateRangePicker component (shadcn calendar)
+- [x] Calendar component (shadcn)
+- [x] Popover component (shadcn)
+- [ ] DataTable genérica com filtros - **Não implementado (não necessário)**
+- [ ] ExportButton (preparar para futuro) - **Movido para backlog**
 
 #### Dashboard - Melhorias
-- [ ] Adicionar gráfico de receita mensal (recharts/tremor)
-- [ ] Gráfico de inadimplência
-- [ ] Top unidades por receita
+- [ ] Adicionar gráfico de receita mensal (recharts/tremor) - **Movido para backlog (opcional)**
+- [ ] Gráfico de inadimplência - **Movido para backlog (opcional)**
+- [ ] Top unidades por receita - **Movido para backlog (opcional)**
+
+#### Correções e Melhorias
+- [x] Adicionar safe access (optional chaining) para dados da API
+- [x] Validação de datas inválidas/vazias em formatDate
+- [x] Fallback values para todos os campos opcionais
+- [x] Error handling robusto em todas as páginas
+- [x] Loading states e empty states
 
 ### Entregáveis
-✅ Relatórios financeiros completos
-✅ Filtros avançados funcionando
-✅ Visualizações gráficas
-✅ Dashboard enriquecido
+✅ Relatórios financeiros completos com filtros avançados
+✅ Histórico de pagamentos com múltiplos filtros
+✅ Filtros avançados funcionando (período, tipo, status, contrato, inquilino)
+✅ DateRangePicker component reutilizável
+✅ Página principal de relatórios com navegação
+✅ Validação e tratamento de erros robusto
+
+**Concluído em:** 14/01/2025
+**Branch:** feature/sprint6-reports
+**Commits:**
+- 19827d8 feat: implement Sprint 6 - Reports module with Financial and Payments reports
+- 06cb782 fix: add safe access and validation to prevent errors in reports
 
 ---
 
@@ -704,14 +721,14 @@ Semana 3: [███████████████████████
 Semana 4: [████████████████████████] Tenants ✅
 Semana 5: [████████████████████████] Leases ✅
 Semana 6: [████████████████████████] Payments ✅
-Semana 7: [------------------------] Reports & Advanced
+Semana 7: [████████████████████████] Reports & Advanced ✅
 Semana 8: [------------------------] Settings & Users
 Semana 9: [------------------------] Polish & Testing
 Semana 10: [------------------------] Production Ready
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          MVP Core Features  │  Advanced  │  Launch
-             (60% ✅)        │            │
+             (70% ✅)        │            │
 ```
 
 ---

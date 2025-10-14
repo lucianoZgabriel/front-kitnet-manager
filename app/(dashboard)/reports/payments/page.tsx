@@ -235,7 +235,7 @@ export default function PaymentsReportPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-green-600">
-                  {report.payments.filter((p) => p.status === 'paid').length}
+                  {report.payments?.filter((p) => p.status === 'paid').length || 0}
                 </div>
                 <p className="text-muted-foreground text-xs">
                   Valor: {formatCurrency(totals.paid)}
@@ -250,7 +250,7 @@ export default function PaymentsReportPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-blue-600">
-                  {report.payments.filter((p) => p.status === 'pending').length}
+                  {report.payments?.filter((p) => p.status === 'pending').length || 0}
                 </div>
                 <p className="text-muted-foreground text-xs">
                   Valor: {formatCurrency(totals.pending)}
@@ -265,7 +265,7 @@ export default function PaymentsReportPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-red-600">
-                  {report.payments.filter((p) => p.status === 'overdue').length}
+                  {report.payments?.filter((p) => p.status === 'overdue').length || 0}
                 </div>
                 <p className="text-muted-foreground text-xs">
                   Valor: {formatCurrency(totals.overdue)}
@@ -283,7 +283,7 @@ export default function PaymentsReportPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {report.payments.length === 0 ? (
+              {!report.payments || report.payments.length === 0 ? (
                 <div className="text-muted-foreground py-8 text-center">
                   <FileText className="mx-auto mb-2 h-12 w-12 opacity-20" />
                   <p>Nenhum pagamento encontrado</p>
@@ -304,8 +304,8 @@ export default function PaymentsReportPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {report.payments.map((payment) => (
-                        <TableRow key={payment.id}>
+                      {report.payments?.map((payment, index) => (
+                        <TableRow key={payment.id || `payment-${index}`}>
                           <TableCell className="font-medium">
                             {getPaymentTypeLabel(payment.payment_type)}
                           </TableCell>

@@ -197,7 +197,7 @@ export default function FinancialReportPage() {
                   {formatCurrency(parseFloat(report.summary.paid_amount))}
                 </div>
                 <p className="text-muted-foreground text-xs">
-                  {report.by_status.paid.count} pagamentos
+                  {report.by_status?.paid?.count || 0} pagamentos
                 </p>
               </CardContent>
             </Card>
@@ -212,7 +212,7 @@ export default function FinancialReportPage() {
                   {formatCurrency(parseFloat(report.summary.pending_amount))}
                 </div>
                 <p className="text-muted-foreground text-xs">
-                  {report.by_status.pending.count} pagamentos
+                  {report.by_status?.pending?.count || 0} pagamentos
                 </p>
               </CardContent>
             </Card>
@@ -227,7 +227,7 @@ export default function FinancialReportPage() {
                   {formatCurrency(parseFloat(report.summary.overdue_amount))}
                 </div>
                 <p className="text-muted-foreground text-xs">
-                  {report.by_status.overdue.count} pagamentos
+                  {report.by_status?.overdue?.count || 0} pagamentos
                 </p>
               </CardContent>
             </Card>
@@ -241,10 +241,10 @@ export default function FinancialReportPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-xl font-bold">
-                  {formatCurrency(parseFloat(report.by_type.rent.total_amount))}
+                  {formatCurrency(parseFloat(report.by_type?.rent?.total_amount || '0'))}
                 </div>
                 <p className="text-muted-foreground text-xs">
-                  {report.by_type.rent.count} pagamentos
+                  {report.by_type?.rent?.count || 0} pagamentos
                 </p>
               </CardContent>
             </Card>
@@ -255,10 +255,10 @@ export default function FinancialReportPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-xl font-bold">
-                  {formatCurrency(parseFloat(report.by_type.painting_fee.total_amount))}
+                  {formatCurrency(parseFloat(report.by_type?.painting_fee?.total_amount || '0'))}
                 </div>
                 <p className="text-muted-foreground text-xs">
-                  {report.by_type.painting_fee.count} pagamentos
+                  {report.by_type?.painting_fee?.count || 0} pagamentos
                 </p>
               </CardContent>
             </Card>
@@ -269,10 +269,10 @@ export default function FinancialReportPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-xl font-bold">
-                  {formatCurrency(parseFloat(report.by_type.adjustment.total_amount))}
+                  {formatCurrency(parseFloat(report.by_type?.adjustment?.total_amount || '0'))}
                 </div>
                 <p className="text-muted-foreground text-xs">
-                  {report.by_type.adjustment.count} pagamentos
+                  {report.by_type?.adjustment?.count || 0} pagamentos
                 </p>
               </CardContent>
             </Card>
@@ -285,7 +285,7 @@ export default function FinancialReportPage() {
               <CardDescription>Lista completa de pagamentos no período selecionado</CardDescription>
             </CardHeader>
             <CardContent>
-              {report.payments.length === 0 ? (
+              {!report.payments || report.payments.length === 0 ? (
                 <div className="text-muted-foreground py-8 text-center">
                   Nenhum pagamento encontrado no período selecionado
                 </div>
@@ -304,8 +304,8 @@ export default function FinancialReportPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {report.payments.map((payment) => (
-                        <TableRow key={payment.id}>
+                      {report.payments?.map((payment, index) => (
+                        <TableRow key={payment.id || `payment-${index}`}>
                           <TableCell className="font-medium">
                             {getPaymentTypeLabel(payment.payment_type)}
                           </TableCell>

@@ -2,10 +2,11 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
-import { useOverduePayments } from '@/src/hooks/use-payments'
+import { useOverduePayments, useCancelPayment } from '@/src/hooks/use-payments'
 import { LoadingSpinner } from '@/src/components/shared/loading-spinner'
 import { ErrorMessage } from '@/src/components/shared/error-message'
 import { EmptyState } from '@/src/components/shared/empty-state'
+import { ConfirmDialog } from '@/src/components/shared/confirm-dialog'
 import { Button } from '@/src/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/components/ui/card'
 import {
@@ -31,8 +32,11 @@ const paymentTypeLabels: Record<PaymentType, string> = {
 
 export default function OverduePaymentsPage() {
   const { data: payments, isLoading, error, refetch } = useOverduePayments()
+  const cancelPayment = useCancelPayment()
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null)
   const [showPayDialog, setShowPayDialog] = useState(false)
+  const [showCancelDialog, setShowCancelDialog] = useState(false)
+  const [paymentToCancel, setPaymentToCancel] = useState<Payment | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
 
   // Filtrar por busca
@@ -94,6 +98,19 @@ export default function OverduePaymentsPage() {
   const handlePayClick = (payment: Payment) => {
     setSelectedPayment(payment)
     setShowPayDialog(true)
+  }
+
+  const handleCancelClick = (payment: Payment) => {
+    setPaymentToCancel(payment)
+    setShowCancelDialog(true)
+  }
+
+  const handleCancelConfirm = async () => {
+    if (paymentToCancel) {
+      await cancelPayment.mutateAsync(paymentToCancel.id)
+      setShowCancelDialog(false)
+      setPaymentToCancel(null)
+    }
   }
 
   // Ordenar por dias de atraso (maior primeiro)
@@ -249,13 +266,22 @@ export default function OverduePaymentsPage() {
                           </div>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button
-                            size="sm"
-                            onClick={() => handlePayClick(payment)}
-                            className="bg-green-600 hover:bg-green-700"
-                          >
-                            Registrar Pagamento
-                          </Button>
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => handlePayClick(payment)}
+                              className="bg-green-600 hover:bg-green-700"
+                            >
+                              Registrar Pagamento
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => handleCancelClick(payment)}
+                            >
+                              Cancelar
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     )
@@ -272,6 +298,42 @@ export default function OverduePaymentsPage() {
         payment={selectedPayment}
         open={showPayDialog}
         onOpenChange={setShowPayDialog}
+      />
+
+      {/* Dialog de Cancelamento */}
+      <ConfirmDialog
+        open={showCancelDialog}
+        onOpenChange={setShowCancelDialog}
+        title="Cancelar Pagamento Atrasado"
+        description={
+          paymentToCancel ? (
+            <div className="space-y-2">
+              <p>Tem certeza que deseja cancelar este pagamento atrasado?</p>
+              <div className="bg-muted rounded-md p-3 text-sm">
+                <p>
+                  <strong>Tipo:</strong> {paymentTypeLabels[paymentToCancel.payment_type]}
+                </p>
+                <p>
+                  <strong>Referência:</strong> {formatDate(paymentToCancel.reference_month)}
+                </p>
+                <p>
+                  <strong>Valor:</strong> {formatCurrency(paymentToCancel.amount)}
+                </p>
+                <p>
+                  <strong>Vencimento:</strong> {formatDate(paymentToCancel.due_date)}
+                </p>
+              </div>
+              <p className="text-destructive font-medium">Esta ação não pode ser desfeita.</p>
+            </div>
+          ) : (
+            'Tem certeza que deseja cancelar este pagamento?'
+          )
+        }
+        confirmText="Sim, Cancelar"
+        cancelText="Não, Voltar"
+        onConfirm={handleCancelConfirm}
+        variant="destructive"
+        loading={cancelPayment.isPending}
       />
     </div>
   )

@@ -4,6 +4,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## MANDATORY INSTRUCTIONS
 
+**⚠️ EXECUTION MODE - CRITICAL:**
+- **NEVER execute tools or tasks in CONCURRENT/PARALLEL mode**
+- **ALWAYS execute tools SEQUENTIALLY (one at a time)**
+- This prevents API errors and conversation loss
+- Wait for each tool to complete before executing the next one
+- Examples:
+  - ❌ BAD: Making multiple Read/Glob/Bash calls in a single response
+  - ✅ GOOD: Make one call, wait for result, then make the next call
+  - ❌ BAD: Using Task tool to launch multiple agents simultaneously
+  - ✅ GOOD: Complete one task/agent fully before starting another
+- EXCEPTION: Only use parallel execution when explicitly requested by the user with phrases like "in parallel" or "concurrently"
+
 **⚠️ FILE ENCODING - CRITICAL:**
 - **ALL files MUST be created with UTF-8 encoding**
 - **ALL Portuguese text MUST use proper accents and special characters**
@@ -12,6 +24,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - ✅ "Função" (NOT "Funcao")
   - ✅ "Informações" (NOT "Informacoes")
   - ✅ "Autenticação" (NOT "Autenticacao")
+  - ✅ "Próximos" (NOT "Proximos")
+  - ✅ "Gestão" (NOT "Gestao")
+  - ✅ "válido" (NOT "valido")
+- When creating files, ALWAYS verify encoding is UTF-8
+- Use Edit tool (not Write tool with bash heredoc) for files with Portuguese text
+- Never use ISO-8859 or other non-UTF-8 encodings
   - ✅ "Próximos" (NOT "Proximos")
   - ✅ "Gestão" (NOT "Gestao")
   - ✅ "válido" (NOT "valido")
@@ -182,37 +200,3 @@ Use Swagger UI for interactive testing:
 https://kitnet-manager-production.up.railway.app/swagger/index.html
 
 Or test with curl:
-```bash
-# Login
-curl -X POST https://kitnet-manager-production.up.railway.app/api/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"admin123"}'
-
-# Authenticated request
-curl https://kitnet-manager-production.up.railway.app/api/v1/units \
-  -H "Authorization: Bearer {token}"
-```
-
-## Documentation Files
-
-- **[frontend-docs/README.md](frontend-docs/README.md)** - Start here for overview and quick start
-- **[frontend-docs/API.md](frontend-docs/API.md)** - Complete API reference with examples
-- **[frontend-docs/validation-rules.md](frontend-docs/validation-rules.md)** - All business rules and validation logic
-- **[frontend-docs/examples.md](frontend-docs/examples.md)** - Code examples and utility functions
-- **[PRODUCTION.md](PRODUCTION.md)** - Production deployment info and credentials
-
-## Notes for Frontend Development
-
-This repository is documentation-only. When building the actual frontend:
-
-1. **Recommended stack:** Next.js 14+ with TypeScript, TailwindCSS, React Query
-2. **Copy TypeScript types** from `frontend-docs/types/` to your project
-3. **Use provided utilities** from `frontend-docs/examples.md` for CPF validation, money formatting, etc.
-4. **Implement caching** with React Query or SWR (5min stale time recommended)
-5. **Handle auth globally** with Axios interceptors or similar
-6. **Validate client-side** using rules from `validation-rules.md`
-7. **Test against production API** or set up local backend from main repository
-
-## Related Repositories
-
-Backend repository: https://github.com/lucianoZgabriel/kitnet-manager (Go + PostgreSQL)

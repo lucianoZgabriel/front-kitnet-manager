@@ -498,7 +498,7 @@ Roadmap completo para desenvolvimento do frontend do Kitnet Manager, organizado 
 
 ---
 
-## Sprint 7: Settings & User Management (Semana 8)
+## Sprint 7: Settings & User Management (Semana 8) ✅
 
 ### Objetivos
 - Gestão de usuários (admin only)
@@ -509,32 +509,41 @@ Roadmap completo para desenvolvimento do frontend do Kitnet Manager, organizado 
 ### Tarefas
 
 #### Settings - Profile
-- [ ] Criar `useChangePassword` mutation
-- [ ] Página de perfil (`app/(dashboard)/settings/profile/page.tsx`)
-- [ ] Formulário de troca de senha
-- [ ] Exibir informações do usuário atual
+- [x] Criar `useChangePassword` mutation
+- [x] Página de perfil (`app/(dashboard)/settings/profile/page.tsx`)
+- [x] Formulário de troca de senha
+- [x] Exibir informações do usuário atual
 
 #### Settings - Users (Admin Only)
-- [ ] Criar `useUsers` query
-- [ ] Criar `useCreateUser` mutation
-- [ ] Criar `useUpdateUserRole` mutation
-- [ ] Criar `useDeactivateUser` mutation
-- [ ] Página de usuários (`app/(dashboard)/settings/users/page.tsx`)
-- [ ] UsersTable component
-- [ ] CreateUserDialog
-- [ ] ChangeRoleDialog
-- [ ] Verificação de role (apenas admin vê)
+- [x] Criar `useUsers` query
+- [x] Criar `useCreateUser` mutation
+- [x] Criar `useUpdateUserRole` mutation (useChangeUserRole)
+- [x] Criar `useDeactivateUser` mutation
+- [x] Criar `useActivateUser` mutation
+- [x] Página de usuários (`app/(dashboard)/settings/users/page.tsx`)
+- [x] UsersTable component (implementado inline)
+- [x] CreateUserDialog
+- [x] ChangeRoleDialog
+- [x] Verificação de role (apenas admin vê)
 
 #### Settings - General
-- [ ] Página de configurações (`app/(dashboard)/settings/page.tsx`)
-- [ ] Toggle de tema (light/dark) - opcional
-- [ ] Preferências de notificação (preparar para futuro)
+- [x] Página de configurações (`app/(dashboard)/settings/page.tsx`)
+- [ ] Toggle de tema (light/dark) - **Não implementado (tema forçado em light)**
+- [ ] Preferências de notificação (preparar para futuro) - **Movido para backlog**
 
 ### Entregáveis
 ✅ Gestão de usuários completa
 ✅ Troca de senha funcionando
 ✅ Role-based access control implementado
 ✅ Página de configurações
+✅ Hooks de usuários com todas as mutations necessárias
+✅ Estatísticas de usuários (total, admins, managers, ativos)
+✅ Busca e filtros na listagem de usuários
+✅ UI responsiva e polida
+
+**Concluído em:** 15/01/2025
+**Branch:** feature/sprint7-settings-user-management
+**Commit:** 04fdf32 feat: implement Sprint 7 - Settings & User Management module
 
 ---
 
@@ -722,13 +731,13 @@ Semana 4: [███████████████████████
 Semana 5: [████████████████████████] Leases ✅
 Semana 6: [████████████████████████] Payments ✅
 Semana 7: [████████████████████████] Reports & Advanced ✅
-Semana 8: [------------------------] Settings & Users
+Semana 8: [████████████████████████] Settings & Users ✅
 Semana 9: [------------------------] Polish & Testing
 Semana 10: [------------------------] Production Ready
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          MVP Core Features  │  Advanced  │  Launch
-             (70% ✅)        │            │
+             (80% ✅)        │            │
 ```
 
 ---

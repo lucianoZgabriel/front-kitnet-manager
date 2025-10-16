@@ -3,6 +3,8 @@
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { useOverduePayments, useCancelPayment } from '@/src/hooks/use-payments'
+import { useLeases } from '@/src/hooks/use-leases'
+import { useUnits } from '@/src/hooks/use-units'
 import { LoadingSpinner } from '@/src/components/shared/loading-spinner'
 import { ErrorMessage } from '@/src/components/shared/error-message'
 import { EmptyState } from '@/src/components/shared/empty-state'
@@ -32,12 +34,25 @@ const paymentTypeLabels: Record<PaymentType, string> = {
 
 export default function OverduePaymentsPage() {
   const { data: payments, isLoading, error, refetch } = useOverduePayments()
+  const { data: leases } = useLeases()
+  const { data: units } = useUnits()
   const cancelPayment = useCancelPayment()
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null)
   const [showPayDialog, setShowPayDialog] = useState(false)
   const [showCancelDialog, setShowCancelDialog] = useState(false)
   const [paymentToCancel, setPaymentToCancel] = useState<Payment | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
+
+  // Função helper para buscar número da unidade pelo payment
+  const getUnitNumber = (payment: Payment): string => {
+    if (!leases || !units) return '-'
+
+    const lease = leases.find((l) => l.id === payment.lease_id)
+    if (!lease) return '-'
+
+    const unit = units.find((u) => u.id === lease.unit_id)
+    return unit?.number || '-'
+  }
 
   // Filtrar por busca
   const filteredPayments = useMemo(() => {
@@ -207,9 +222,7 @@ export default function OverduePaymentsPage() {
                           </Button>
                         </TableCell>
                         <TableCell>
-                          <div className="text-sm font-medium">
-                            {payment.lease_id.slice(0, 8)}...
-                          </div>
+                          <div className="text-sm font-medium">Kit {getUnitNumber(payment)}</div>
                         </TableCell>
                         <TableCell>
                           <div className="text-sm">{formatDate(payment.reference_month)}</div>

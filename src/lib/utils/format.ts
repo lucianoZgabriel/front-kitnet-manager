@@ -127,6 +127,27 @@ export function formatDateISO(date: Date): string {
 }
 
 /**
+ * Formata data para formato ISO completo com hora (para enviar à API Go)
+ * @param date - Date object ou string
+ * @returns Data formatada como "YYYY-MM-DDTHH:mm:ssZ" (ISO 8601)
+ */
+export function formatDateTimeISO(date: Date | string): string {
+  const dateObj = typeof date === 'string' ? parseISO(date) : date
+
+  // Se for apenas uma data sem hora, adiciona 12:00:00 para evitar problemas de timezone
+  if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    const parts = date.split('-').map(Number)
+    if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {
+      const [year, month, day] = parts
+      const dateWithTime = new Date(year, month - 1, day, 12, 0, 0)
+      return dateWithTime.toISOString()
+    }
+  }
+
+  return dateObj.toISOString()
+}
+
+/**
  * Calcula multa por atraso no pagamento
  * Business Rule:
  * - 2% de multa fixa sobre o valor

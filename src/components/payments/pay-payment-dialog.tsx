@@ -23,7 +23,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/components/ui/select'
-import { formatCurrency, formatDateISO, calculateLateFee } from '@/src/lib/utils/format'
+import { Checkbox } from '@/src/components/ui/checkbox'
+import {
+  formatCurrency,
+  formatDateISO,
+  formatDateTimeISO,
+  calculateLateFee,
+} from '@/src/lib/utils/format'
 import type { Payment, PaymentMethod } from '@/src/types/api/payment'
 import { useMarkPaymentAsPaid } from '@/src/hooks/use-payments'
 
@@ -37,6 +43,7 @@ const paymentMethods: { value: PaymentMethod; label: string }[] = [
 const payPaymentSchema = z.object({
   payment_date: z.string().min(1, 'Data de pagamento é obrigatória'),
   payment_method: z.enum(['pix', 'cash', 'bank_transfer', 'credit_card']),
+  apply_late_fee: z.boolean().optional(),
 })
 
 type PayPaymentFormData = z.infer<typeof payPaymentSchema>
@@ -63,10 +70,12 @@ export function PayPaymentDialog({ payment, open, onOpenChange }: PayPaymentDial
     defaultValues: {
       payment_date: formatDateISO(new Date()),
       payment_method: 'pix',
+      apply_late_fee: false,
     },
   })
 
   const selectedMethod = watch('payment_method')
+  const applyLateFee = watch('apply_late_fee')
 
   // Auto-preencher data atual ao abrir o dialog
   useEffect(() => {
@@ -103,7 +112,7 @@ export function PayPaymentDialog({ payment, open, onOpenChange }: PayPaymentDial
     await markAsPaid.mutateAsync({
       id: payment.id,
       data: {
-        payment_date: data.payment_date,
+        payment_date: formatDateTimeISO(data.payment_date),
         payment_method: data.payment_method,
       },
     })
@@ -130,22 +139,58 @@ export function PayPaymentDialog({ payment, open, onOpenChange }: PayPaymentDial
 
             {hasLateFee && (
               <>
-                <div className="flex justify-between text-sm text-red-600">
-                  <span>Multa (2%):</span>
-                  <span>+ {formatCurrency(lateFeeData.penalty)}</span>
+                <div className="flex items-center space-x-2 border-t pt-3">
+                  <Checkbox
+                    id="apply_late_fee"
+                    checked={applyLateFee}
+                    onCheckedChange={(checked) => setValue('apply_late_fee', checked as boolean)}
+                  />
+                  <Label
+                    htmlFor="apply_late_fee"
+                    className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Aplicar juros e multa por atraso ({daysOverdue}{' '}
+                    {daysOverdue === 1 ? 'dia' : 'dias'})
+                  </Label>
                 </div>
-                <div className="flex justify-between text-sm text-red-600">
-                  <span>Juros ({daysOverdue} dias):</span>
-                  <span>+ {formatCurrency(lateFeeData.interest)}</span>
-                </div>
-                <div className="flex justify-between border-t pt-2 text-base font-bold">
-                  <span>Total com Multa:</span>
-                  <span className="text-red-600">{formatCurrency(lateFeeData.total)}</span>
-                </div>
+
+                {applyLateFee && (
+                  <>
+                    <div className="flex justify-between text-sm text-red-600">
+                      <span>Multa (2%):</span>
+                      <span>+ {formatCurrency(lateFeeData.penalty)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm text-red-600">
+                      <span>Juros ({daysOverdue} dias):</span>
+                      <span>+ {formatCurrency(lateFeeData.interest)}</span>
+                    </div>
+                    <div className="flex justify-between border-t pt-2 text-base font-bold">
+                      <span>Total com Juros:</span>
+                      <span className="text-red-600">{formatCurrency(lateFeeData.total)}</span>
+                    </div>
+                  </>
+                )}
+
+                {!applyLateFee && (
+                  <div className="flex justify-between border-t pt-2 text-base font-bold">
+                    <span>Total a Receber:</span>
+                    <span>{formatCurrency(payment.amount)}</span>
+                  </div>
+                )}
+
                 <p className="text-muted-foreground text-xs">
-                  * O valor com multa é informativo. Registre o valor recebido.
+                  {applyLateFee
+                    ? '* O valor com juros será usado como referência para o pagamento.'
+                    : '* O pagamento será registrado sem juros.'}
                 </p>
               </>
+            )}
+
+            {!hasLateFee && (
+              <div className="flex justify-between border-t pt-2 text-base font-bold">
+                <span>Total a Receber:</span>
+                <span>{formatCurrency(payment.amount)}</span>
+              </div>
             )}
           </div>
 

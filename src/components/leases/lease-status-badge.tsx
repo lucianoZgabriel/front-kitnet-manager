@@ -11,34 +11,29 @@ const statusConfig: Record<
   LeaseStatus,
   {
     label: string
-    variant: 'default' | 'secondary' | 'destructive' | 'outline'
+    variant: 'default' | 'secondary' | 'destructive' | 'success' | 'warning' | 'info' | 'outline'
     icon: typeof CheckCircle
-    className: string
   }
 > = {
   active: {
     label: 'Ativo',
-    variant: 'default',
+    variant: 'success',
     icon: CheckCircle,
-    className: 'bg-green-100 text-green-800 hover:bg-green-100',
   },
   expiring_soon: {
     label: 'Expirando em Breve',
-    variant: 'outline',
+    variant: 'warning',
     icon: AlertTriangle,
-    className: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100',
   },
   expired: {
     label: 'Expirado',
     variant: 'secondary',
     icon: Clock,
-    className: 'bg-gray-100 text-gray-800 hover:bg-gray-100',
   },
   cancelled: {
     label: 'Cancelado',
     variant: 'destructive',
     icon: XCircle,
-    className: 'bg-red-100 text-red-800 hover:bg-red-100',
   },
 }
 
@@ -47,7 +42,7 @@ export function LeaseStatusBadge({ status, showIcon = false }: LeaseStatusBadgeP
   const Icon = config.icon
 
   return (
-    <Badge variant={config.variant} className={config.className}>
+    <Badge variant={config.variant}>
       {showIcon && <Icon className="mr-1 h-3 w-3" />}
       {config.label}
     </Badge>

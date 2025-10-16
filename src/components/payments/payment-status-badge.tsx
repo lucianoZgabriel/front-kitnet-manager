@@ -11,34 +11,29 @@ const statusConfig: Record<
   PaymentStatus,
   {
     label: string
-    variant: 'default' | 'secondary' | 'destructive' | 'outline'
+    variant: 'default' | 'secondary' | 'destructive' | 'success' | 'warning' | 'info' | 'outline'
     icon: typeof CheckCircle
-    className: string
   }
 > = {
   pending: {
     label: 'Pendente',
-    variant: 'outline',
+    variant: 'info',
     icon: Clock,
-    className: 'bg-blue-100 text-blue-800 hover:bg-blue-100',
   },
   paid: {
     label: 'Pago',
-    variant: 'default',
+    variant: 'success',
     icon: CheckCircle,
-    className: 'bg-green-100 text-green-800 hover:bg-green-100',
   },
   overdue: {
     label: 'Atrasado',
     variant: 'destructive',
     icon: AlertCircle,
-    className: 'bg-red-100 text-red-800 hover:bg-red-100',
   },
   cancelled: {
     label: 'Cancelado',
     variant: 'secondary',
     icon: XCircle,
-    className: 'bg-gray-100 text-gray-800 hover:bg-gray-100',
   },
 }
 
@@ -47,7 +42,7 @@ export function PaymentStatusBadge({ status, showIcon = false }: PaymentStatusBa
   const Icon = config.icon
 
   return (
-    <Badge variant={config.variant} className={config.className}>
+    <Badge variant={config.variant}>
       {showIcon && <Icon className="mr-1 h-3 w-3" />}
       {config.label}
     </Badge>

@@ -24,12 +24,17 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="w-64 p-0">
-        <SheetHeader className="border-b p-6">
+        <SheetHeader className="from-primary/5 border-b bg-gradient-to-r to-transparent p-6">
           <SheetTitle className="flex items-center space-x-2">
-            <div className="bg-primary text-primary-foreground flex h-8 w-8 items-center justify-center rounded-lg">
+            <div className="bg-primary text-primary-foreground flex h-10 w-10 items-center justify-center rounded-lg shadow-md">
               <span className="text-lg font-bold">K</span>
             </div>
-            <span className="text-lg font-semibold">Kitnet Manager</span>
+            <div className="flex flex-col items-start">
+              <span className="from-primary to-primary/80 bg-gradient-to-r bg-clip-text text-base leading-tight font-bold text-transparent">
+                Kitnet Manager
+              </span>
+              <span className="text-muted-foreground text-xs leading-tight">Sistema de Gestão</span>
+            </div>
           </SheetTitle>
         </SheetHeader>
 
@@ -44,10 +49,10 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
                 href={item.href}
                 onClick={() => onOpenChange(false)}
                 className={cn(
-                  'flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                  'flex items-center space-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
                   isActive
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                    ? 'bg-primary text-primary-foreground shadow-md'
+                    : 'text-muted-foreground hover:bg-accent hover:text-foreground hover:shadow-sm',
                   item.disabled && 'pointer-events-none opacity-50'
                 )}
               >

@@ -79,16 +79,18 @@ export function PayPaymentDialog({ payment, open, onOpenChange }: PayPaymentDial
 
   // Auto-preencher data atual ao abrir o dialog
   useEffect(() => {
-    if (open) {
+    if (open && payment) {
       setValue('payment_date', formatDateISO(new Date()))
       setValue('payment_method', 'pix')
 
-      // Calcular dias de atraso
-      if (payment && payment.status === 'overdue') {
-        const dueDateObj = parseISO(payment.due_date)
-        const today = new Date()
-        const days = differenceInDays(today, dueDateObj)
-        setDaysOverdue(days > 0 ? days : 0)
+      // Calcular dias de atraso - verifica pela data de vencimento, não pelo status
+      const dueDateObj = parseISO(payment.due_date)
+      const today = new Date()
+      const days = differenceInDays(today, dueDateObj)
+
+      // Se passou da data de vencimento, calcular dias de atraso
+      if (days > 0) {
+        setDaysOverdue(days)
       } else {
         setDaysOverdue(0)
       }

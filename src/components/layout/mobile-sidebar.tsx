@@ -29,9 +29,12 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
             <div className="bg-primary text-primary-foreground flex h-10 w-10 items-center justify-center rounded-lg shadow-md">
               <span className="text-lg font-bold">K</span>
             </div>
-            <span className="from-primary to-primary/80 bg-gradient-to-r bg-clip-text text-lg font-bold text-transparent">
-              Kitnet Manager
-            </span>
+            <div className="flex flex-col items-start">
+              <span className="from-primary to-primary/80 bg-gradient-to-r bg-clip-text text-base leading-tight font-bold text-transparent">
+                Kitnet Manager
+              </span>
+              <span className="text-muted-foreground text-xs leading-tight">Sistema de Gestão</span>
+            </div>
           </SheetTitle>
         </SheetHeader>
 

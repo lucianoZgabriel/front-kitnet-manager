@@ -40,17 +40,6 @@ export function Header({ onMobileMenuOpen }: HeaderProps) {
         <Button variant="ghost" size="icon" onClick={toggleSidebar} className="hidden lg:flex">
           <Menu className="h-5 w-5" />
         </Button>
-
-        {/* Logo/Title */}
-        <div className="hidden items-center space-x-2 md:flex">
-          <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-lg">
-            <span className="text-primary-foreground text-sm font-bold">KM</span>
-          </div>
-          <div className="flex flex-col">
-            <h1 className="text-sm leading-tight font-semibold">Kitnet Manager</h1>
-            <p className="text-muted-foreground text-xs leading-tight">Sistema de Gestão</p>
-          </div>
-        </div>
       </div>
 
       <div className="flex items-center space-x-4">

@@ -45,24 +45,36 @@ export function LoginForm() {
   }
 
   return (
-    <Card>
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-center text-2xl font-bold">Kitnet Manager</CardTitle>
-        <CardDescription className="text-center">
+    <Card className="w-full max-w-md shadow-xl">
+      <CardHeader className="space-y-3 pb-6">
+        <div className="flex justify-center">
+          <div className="bg-primary flex h-16 w-16 items-center justify-center rounded-2xl shadow-lg">
+            <span className="text-primary-foreground text-3xl font-bold">K</span>
+          </div>
+        </div>
+        <CardTitle className="from-primary to-primary/80 bg-gradient-to-r bg-clip-text text-center text-3xl font-bold text-transparent">
+          Kitnet Manager
+        </CardTitle>
+        <CardDescription className="text-center text-base">
           Entre com suas credenciais para acessar o sistema
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pb-8">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
             <FormField
               control={form.control}
               name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Usuário</FormLabel>
+                  <FormLabel className="text-sm font-medium">Usuário</FormLabel>
                   <FormControl>
-                    <Input placeholder="Digite seu usuário" {...field} disabled={isLoading} />
+                    <Input
+                      placeholder="Digite seu usuário"
+                      className="h-11"
+                      {...field}
+                      disabled={isLoading}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -73,11 +85,12 @@ export function LoginForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Senha</FormLabel>
+                  <FormLabel className="text-sm font-medium">Senha</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
                       placeholder="Digite sua senha"
+                      className="h-11"
                       {...field}
                       disabled={isLoading}
                     />
@@ -86,10 +99,10 @@ export function LoginForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="h-11 w-full text-base shadow-md" disabled={isLoading}>
               {isLoading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Entrando...
                 </>
               ) : (
@@ -98,8 +111,10 @@ export function LoginForm() {
             </Button>
           </form>
         </Form>
-        <div className="text-muted-foreground mt-4 text-center text-sm">
-          <p>Credenciais padrão: admin / admin123</p>
+        <div className="bg-muted/50 mt-6 rounded-lg border p-3 text-center">
+          <p className="text-muted-foreground text-sm">
+            <span className="font-medium">Credenciais padrão:</span> admin / admin123
+          </p>
         </div>
       </CardContent>
     </Card>

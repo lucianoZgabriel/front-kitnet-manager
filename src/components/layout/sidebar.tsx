@@ -20,17 +20,21 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        'bg-background fixed top-0 left-0 z-30 h-screen border-r transition-all duration-300 ease-in-out',
+        'fixed top-0 left-0 z-30 h-screen border-r bg-white shadow-sm transition-all duration-300 ease-in-out',
         sidebarOpen ? 'w-64' : 'w-20',
         'hidden lg:block'
       )}
     >
-      <div className="flex h-16 items-center border-b px-4">
+      <div className="from-primary/5 flex h-16 items-center border-b bg-gradient-to-r to-transparent px-4">
         <Link href="/dashboard" className="flex items-center space-x-2">
-          <div className="bg-primary text-primary-foreground flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg">
+          <div className="bg-primary text-primary-foreground flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg shadow-md">
             <span className="text-lg font-bold">K</span>
           </div>
-          {sidebarOpen && <span className="text-lg font-semibold">Kitnet Manager</span>}
+          {sidebarOpen && (
+            <span className="from-primary to-primary/80 bg-gradient-to-r bg-clip-text text-lg font-bold text-transparent">
+              Kitnet Manager
+            </span>
+          )}
         </Link>
       </div>
 
@@ -44,11 +48,11 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                'flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
                 sidebarOpen ? 'space-x-3' : 'justify-center',
                 isActive
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                  ? 'bg-primary text-primary-foreground shadow-md'
+                  : 'text-muted-foreground hover:bg-accent hover:text-foreground hover:shadow-sm',
                 item.disabled && 'pointer-events-none opacity-50'
               )}
               title={!sidebarOpen ? item.title : undefined}

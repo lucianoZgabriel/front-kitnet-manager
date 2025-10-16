@@ -29,7 +29,7 @@ export function Header({ onMobileMenuOpen }: HeaderProps) {
   }
 
   return (
-    <header className="bg-background sticky top-0 z-20 flex h-16 items-center justify-between border-b px-6">
+    <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b bg-white px-6 shadow-sm">
       <div className="flex items-center space-x-4">
         {/* Mobile menu button */}
         <Button variant="ghost" size="icon" onClick={onMobileMenuOpen} className="lg:hidden">
@@ -40,16 +40,27 @@ export function Header({ onMobileMenuOpen }: HeaderProps) {
         <Button variant="ghost" size="icon" onClick={toggleSidebar} className="hidden lg:flex">
           <Menu className="h-5 w-5" />
         </Button>
+
+        {/* Logo/Title */}
+        <div className="hidden items-center space-x-2 md:flex">
+          <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-lg">
+            <span className="text-primary-foreground text-sm font-bold">KM</span>
+          </div>
+          <div className="flex flex-col">
+            <h1 className="text-sm leading-tight font-semibold">Kitnet Manager</h1>
+            <p className="text-muted-foreground text-xs leading-tight">Sistema de Gestão</p>
+          </div>
+        </div>
       </div>
 
       <div className="flex items-center space-x-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center space-x-2">
+            <Button variant="ghost" className="hover:bg-accent flex items-center space-x-2">
               <div className="bg-primary text-primary-foreground flex h-8 w-8 items-center justify-center rounded-full">
                 <User className="h-4 w-4" />
               </div>
-              <span className="hidden sm:inline-block">{user?.username}</span>
+              <span className="hidden font-medium sm:inline-block">{user?.username}</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
@@ -65,7 +76,10 @@ export function Header({ onMobileMenuOpen }: HeaderProps) {
               Perfil
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
+            <DropdownMenuItem
+              onClick={handleLogout}
+              className="text-destructive focus:text-destructive"
+            >
               <LogOut className="mr-2 h-4 w-4" />
               Sair
             </DropdownMenuItem>

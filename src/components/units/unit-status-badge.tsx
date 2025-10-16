@@ -11,34 +11,29 @@ const statusConfig: Record<
   UnitStatus,
   {
     label: string
-    variant: 'default' | 'secondary' | 'destructive' | 'outline'
+    variant: 'default' | 'secondary' | 'destructive' | 'success' | 'warning' | 'info' | 'outline'
     icon: typeof CheckCircle
-    className: string
   }
 > = {
   available: {
     label: 'Disponível',
-    variant: 'default',
+    variant: 'success',
     icon: CheckCircle,
-    className: 'bg-green-100 text-green-800 hover:bg-green-100',
   },
   occupied: {
     label: 'Ocupada',
-    variant: 'secondary',
+    variant: 'info',
     icon: AlertTriangle,
-    className: 'bg-blue-100 text-blue-800 hover:bg-blue-100',
   },
   maintenance: {
     label: 'Manutenção',
-    variant: 'outline',
+    variant: 'warning',
     icon: Wrench,
-    className: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100',
   },
   renovation: {
     label: 'Reforma',
-    variant: 'outline',
+    variant: 'secondary',
     icon: Hammer,
-    className: 'bg-purple-100 text-purple-800 hover:bg-purple-100',
   },
 }
 
@@ -47,7 +42,7 @@ export function UnitStatusBadge({ status, showIcon = false }: UnitStatusBadgePro
   const Icon = config.icon
 
   return (
-    <Badge variant={config.variant} className={config.className}>
+    <Badge variant={config.variant}>
       {showIcon && <Icon className="mr-1 h-3 w-3" />}
       {config.label}
     </Badge>

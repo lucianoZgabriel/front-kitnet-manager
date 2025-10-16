@@ -3,6 +3,8 @@
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { useOverduePayments, useCancelPayment } from '@/src/hooks/use-payments'
+import { useLeases } from '@/src/hooks/use-leases'
+import { useUnits } from '@/src/hooks/use-units'
 import { LoadingSpinner } from '@/src/components/shared/loading-spinner'
 import { ErrorMessage } from '@/src/components/shared/error-message'
 import { EmptyState } from '@/src/components/shared/empty-state'
@@ -18,9 +20,9 @@ import {
   TableRow,
 } from '@/src/components/ui/table'
 import { Input } from '@/src/components/ui/input'
-import { AlertTriangle, Search, DollarSign, Calendar } from 'lucide-react'
+import { AlertTriangle, Search, DollarSign } from 'lucide-react'
 import { PayPaymentDialog } from '@/src/components/payments/pay-payment-dialog'
-import { formatCurrency, formatDate, calculateLateFee } from '@/src/lib/utils/format'
+import { formatCurrency, formatDate } from '@/src/lib/utils/format'
 import { differenceInDays, parseISO } from 'date-fns'
 import type { Payment, PaymentType } from '@/src/types/api/payment'
 
@@ -32,12 +34,25 @@ const paymentTypeLabels: Record<PaymentType, string> = {
 
 export default function OverduePaymentsPage() {
   const { data: payments, isLoading, error, refetch } = useOverduePayments()
+  const { data: leases } = useLeases()
+  const { data: units } = useUnits()
   const cancelPayment = useCancelPayment()
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null)
   const [showPayDialog, setShowPayDialog] = useState(false)
   const [showCancelDialog, setShowCancelDialog] = useState(false)
   const [paymentToCancel, setPaymentToCancel] = useState<Payment | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
+
+  // Função helper para buscar número da unidade pelo payment
+  const getUnitNumber = (payment: Payment): string => {
+    if (!leases || !units) return '-'
+
+    const lease = leases.find((l) => l.id === payment.lease_id)
+    if (!lease) return '-'
+
+    const unit = units.find((u) => u.id === lease.unit_id)
+    return unit?.number || '-'
+  }
 
   // Filtrar por busca
   const filteredPayments = useMemo(() => {
@@ -54,26 +69,17 @@ export default function OverduePaymentsPage() {
 
   // Calcular totais
   const totalOverdue = useMemo(() => {
-    if (!filteredPayments) return { count: 0, amount: 0, lateFees: 0 }
+    if (!filteredPayments) return { count: 0, amount: 0 }
 
     let amount = 0
-    let lateFees = 0
 
     filteredPayments.forEach((payment) => {
-      const dueDateObj = parseISO(payment.due_date)
-      const today = new Date()
-      const daysOverdue = differenceInDays(today, dueDateObj)
-
-      const lateFee = calculateLateFee(payment.amount, daysOverdue)
-
-      amount += lateFee.amount
-      lateFees += lateFee.penalty + lateFee.interest
+      amount += parseFloat(payment.amount)
     })
 
     return {
       count: filteredPayments.length,
       amount,
-      lateFees,
     }
   }, [filteredPayments])
 
@@ -129,7 +135,7 @@ export default function OverduePaymentsPage() {
       </div>
 
       {/* Estatísticas */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Atrasado</CardTitle>
@@ -145,27 +151,12 @@ export default function OverduePaymentsPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Valor Original</CardTitle>
+            <CardTitle className="text-sm font-medium">Valor Total</CardTitle>
             <DollarSign className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(totalOverdue.amount)}</div>
-            <p className="text-muted-foreground text-xs">Sem multas</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Multas e Juros</CardTitle>
-            <Calendar className="h-4 w-4 text-red-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">
-              {formatCurrency(totalOverdue.lateFees)}
-            </div>
-            <p className="text-muted-foreground text-xs">
-              Total: {formatCurrency(totalOverdue.amount + totalOverdue.lateFees)}
-            </p>
+            <p className="text-muted-foreground text-xs">Pagamentos em atraso</p>
           </CardContent>
         </Card>
       </div>
@@ -207,12 +198,12 @@ export default function OverduePaymentsPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Contrato</TableHead>
+                    <TableHead>Unidade</TableHead>
                     <TableHead>Referência</TableHead>
                     <TableHead>Tipo</TableHead>
                     <TableHead>Vencimento</TableHead>
                     <TableHead>Dias de Atraso</TableHead>
                     <TableHead>Valor Original</TableHead>
-                    <TableHead>Multa/Juros</TableHead>
                     <TableHead>Total</TableHead>
                     <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
@@ -222,7 +213,6 @@ export default function OverduePaymentsPage() {
                     const dueDateObj = parseISO(payment.due_date)
                     const today = new Date()
                     const daysOverdue = differenceInDays(today, dueDateObj)
-                    const lateFee = calculateLateFee(payment.amount, daysOverdue)
 
                     return (
                       <TableRow key={payment.id} className="hover:bg-red-50/50">
@@ -230,6 +220,9 @@ export default function OverduePaymentsPage() {
                           <Button variant="link" asChild className="h-auto p-0">
                             <Link href={`/leases/${payment.lease_id}`}>Ver Contrato</Link>
                           </Button>
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-sm font-medium">Kit {getUnitNumber(payment)}</div>
                         </TableCell>
                         <TableCell>
                           <div className="text-sm">{formatDate(payment.reference_month)}</div>
@@ -249,21 +242,10 @@ export default function OverduePaymentsPage() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div className="font-medium">{formatCurrency(lateFee.amount)}</div>
+                          <div className="font-medium">{formatCurrency(payment.amount)}</div>
                         </TableCell>
                         <TableCell>
-                          <div className="font-medium text-red-600">
-                            + {formatCurrency(lateFee.penalty + lateFee.interest)}
-                          </div>
-                          <div className="text-muted-foreground text-xs">
-                            Multa: {formatCurrency(lateFee.penalty)} | Juros:{' '}
-                            {formatCurrency(lateFee.interest)}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="font-bold text-red-600">
-                            {formatCurrency(lateFee.total)}
-                          </div>
+                          <div className="font-bold">{formatCurrency(payment.amount)}</div>
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">

@@ -1,10 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { differenceInDays, parseISO } from 'date-fns'
 import {
   Dialog,
   DialogContent,
@@ -23,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/components/ui/select'
-import { formatCurrency, formatDateISO, calculateLateFee } from '@/src/lib/utils/format'
+import { formatCurrency, formatDateISO, formatDateTimeISO } from '@/src/lib/utils/format'
 import type { Payment, PaymentMethod } from '@/src/types/api/payment'
 import { useMarkPaymentAsPaid } from '@/src/hooks/use-payments'
 
@@ -48,7 +47,6 @@ interface PayPaymentDialogProps {
 }
 
 export function PayPaymentDialog({ payment, open, onOpenChange }: PayPaymentDialogProps) {
-  const [daysOverdue, setDaysOverdue] = useState(0)
   const markAsPaid = useMarkPaymentAsPaid()
 
   const {
@@ -73,37 +71,23 @@ export function PayPaymentDialog({ payment, open, onOpenChange }: PayPaymentDial
     if (open) {
       setValue('payment_date', formatDateISO(new Date()))
       setValue('payment_method', 'pix')
-
-      // Calcular dias de atraso
-      if (payment && payment.status === 'overdue') {
-        const dueDateObj = parseISO(payment.due_date)
-        const today = new Date()
-        const days = differenceInDays(today, dueDateObj)
-        setDaysOverdue(days > 0 ? days : 0)
-      } else {
-        setDaysOverdue(0)
-      }
     }
-  }, [open, payment, setValue])
+  }, [open, setValue])
 
   // Reset form ao fechar
   useEffect(() => {
     if (!open) {
       reset()
-      setDaysOverdue(0)
     }
   }, [open, reset])
 
   if (!payment) return null
 
-  const lateFeeData = calculateLateFee(payment.amount, daysOverdue)
-  const hasLateFee = daysOverdue > 0
-
   const onSubmit = async (data: PayPaymentFormData) => {
     await markAsPaid.mutateAsync({
       id: payment.id,
       data: {
-        payment_date: data.payment_date,
+        payment_date: formatDateTimeISO(data.payment_date),
         payment_method: data.payment_method,
       },
     })
@@ -124,29 +108,13 @@ export function PayPaymentDialog({ payment, open, onOpenChange }: PayPaymentDial
           {/* Informações do pagamento */}
           <div className="bg-muted/50 space-y-2 rounded-lg border p-4">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Valor Original:</span>
+              <span className="text-muted-foreground">Valor:</span>
               <span className="font-medium">{formatCurrency(payment.amount)}</span>
             </div>
-
-            {hasLateFee && (
-              <>
-                <div className="flex justify-between text-sm text-red-600">
-                  <span>Multa (2%):</span>
-                  <span>+ {formatCurrency(lateFeeData.penalty)}</span>
-                </div>
-                <div className="flex justify-between text-sm text-red-600">
-                  <span>Juros ({daysOverdue} dias):</span>
-                  <span>+ {formatCurrency(lateFeeData.interest)}</span>
-                </div>
-                <div className="flex justify-between border-t pt-2 text-base font-bold">
-                  <span>Total com Multa:</span>
-                  <span className="text-red-600">{formatCurrency(lateFeeData.total)}</span>
-                </div>
-                <p className="text-muted-foreground text-xs">
-                  * O valor com multa é informativo. Registre o valor recebido.
-                </p>
-              </>
-            )}
+            <div className="flex justify-between border-t pt-2 text-base font-bold">
+              <span>Total a Receber:</span>
+              <span>{formatCurrency(payment.amount)}</span>
+            </div>
           </div>
 
           {/* Data de pagamento */}

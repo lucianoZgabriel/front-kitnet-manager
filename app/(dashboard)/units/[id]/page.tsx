@@ -44,7 +44,16 @@ export default function UnitDetailsPage() {
 
   // Detectar query param ?edit=true para entrar direto no modo de edição
   useEffect(() => {
-    if (searchParams.get('edit') === 'true') {
+    const editParam = searchParams.get('edit')
+    console.log('[UNIT DETAILS] Query params changed', {
+      editParam,
+      willSetEditing: editParam === 'true',
+      currentPath: window.location.pathname,
+      fullUrl: window.location.href,
+    })
+
+    if (editParam === 'true') {
+      console.log('[UNIT DETAILS] Setting editing mode to true')
       setIsEditing(true)
     }
   }, [searchParams])

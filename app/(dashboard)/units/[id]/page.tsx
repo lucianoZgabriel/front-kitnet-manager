@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
+
+// Force dynamic rendering in production (fix Vercel deployment issue)
+export const dynamic = 'force-dynamic'
 import Link from 'next/link'
 import { useUnit, useDeleteUnit, useUpdateUnitStatus } from '@/src/hooks/use-units'
 import { useLeases } from '@/src/hooks/use-leases'

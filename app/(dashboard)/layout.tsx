@@ -13,16 +13,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { sidebarOpen } = useUIStore()
   const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [hasCheckedAuth, setHasCheckedAuth] = useState(false)
 
-  // Redirecionar para login se não autenticado
+  // Redirecionar para login se não autenticado (APENAS na primeira verificação)
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push('/login')
+    if (!isLoading) {
+      setHasCheckedAuth(true)
+      if (!isAuthenticated) {
+        console.log('[DASHBOARD LAYOUT] Not authenticated, redirecting to login')
+        router.push('/login')
+      }
     }
   }, [isAuthenticated, isLoading, router])
 
-  // Mostrar loading enquanto carrega
-  if (isLoading) {
+  // Mostrar loading APENAS na primeira carga (não em re-renderizações)
+  if (isLoading && !hasCheckedAuth) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
@@ -33,8 +38,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     )
   }
 
-  // Se não está autenticado, mostrar nada (vai redirecionar)
-  if (!isAuthenticated) {
+  // Se não está autenticado E já verificamos, mostrar nada (vai redirecionar)
+  if (!isAuthenticated && hasCheckedAuth) {
     return null
   }
 

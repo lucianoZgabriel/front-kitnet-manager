@@ -6,8 +6,10 @@ import { Alerts, Alert } from '@/src/types/api/dashboard'
 import { AlertTriangle, Clock, Home, DollarSign, ExternalLink } from 'lucide-react'
 import { useLeases } from '@/src/hooks/use-leases'
 import { useUnits } from '@/src/hooks/use-units'
+import { useOverduePayments } from '@/src/hooks/use-payments'
 import type { Lease } from '@/src/types/api/lease'
 import type { Unit } from '@/src/types/api/unit'
+import type { Payment } from '@/src/types/api/payment'
 
 interface AlertsListProps {
   alerts: Alerts
@@ -57,23 +59,35 @@ interface AlertSectionProps {
   type: 'overdue_payment' | 'expiring_lease' | 'vacant_unit'
   leases?: Lease[]
   units?: Unit[]
+  payments?: Payment[]
 }
 
-function AlertSection({ alerts, type, leases, units }: AlertSectionProps) {
+function AlertSection({ alerts, type, leases, units, payments }: AlertSectionProps) {
   if (alerts.length === 0) return null
 
   const config = typeConfig[type]
   const Icon = config.icon
 
-  // Função para buscar número da unidade pelo entity_id (lease_id)
-  const getUnitNumber = (entityId: string): string => {
-    if (!leases || !units) return '?'
+  // Função para buscar dados do pagamento, lease e unidade pelo entity_id (payment_id)
+  const getPaymentInfo = (
+    entityId: string
+  ): { unitNumber: string; leaseId: string | null } | null => {
+    if (!payments || !leases || !units) return null
 
-    const lease = leases.find((l) => l.id === entityId)
-    if (!lease) return '?'
+    // entity_id é o payment_id para alertas de pagamento atrasado
+    const payment = payments.find((p) => p.id === entityId)
+    if (!payment) return null
+
+    const lease = leases.find((l) => l.id === payment.lease_id)
+    if (!lease) return null
 
     const unit = units.find((u) => u.id === lease.unit_id)
-    return unit?.number || '?'
+    if (!unit) return null
+
+    return {
+      unitNumber: unit.number,
+      leaseId: lease.id,
+    }
   }
 
   return (
@@ -82,8 +96,7 @@ function AlertSection({ alerts, type, leases, units }: AlertSectionProps) {
       <div className="space-y-2">
         {alerts.map((alert, index) => {
           const severityStyle = severityConfig[alert.severity]
-          const unitNumber = type === 'overdue_payment' ? getUnitNumber(alert.entity_id) : null
-          const leaseId = type === 'overdue_payment' ? alert.entity_id : null
+          const paymentInfo = type === 'overdue_payment' ? getPaymentInfo(alert.entity_id) : null
 
           return (
             <div
@@ -95,7 +108,7 @@ function AlertSection({ alerts, type, leases, units }: AlertSectionProps) {
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-900">
-                      {unitNumber && `Unidade ${unitNumber} • `}
+                      {paymentInfo && `Unidade ${paymentInfo.unitNumber} • `}
                       {alert.title}
                     </p>
                     <p className="mt-1 text-xs text-gray-600">{alert.description}</p>
@@ -104,10 +117,10 @@ function AlertSection({ alerts, type, leases, units }: AlertSectionProps) {
                     {config.label}
                   </Badge>
                 </div>
-                {leaseId && (
+                {paymentInfo?.leaseId && (
                   <div className="mt-2">
                     <Button variant="link" size="sm" asChild className="h-auto p-0 text-xs">
-                      <Link href={`/leases/${leaseId}`}>
+                      <Link href={`/leases/${paymentInfo.leaseId}`}>
                         Ver Contrato
                         <ExternalLink className="ml-1 h-3 w-3" />
                       </Link>
@@ -124,9 +137,10 @@ function AlertSection({ alerts, type, leases, units }: AlertSectionProps) {
 }
 
 export function AlertsList({ alerts }: AlertsListProps) {
-  // Buscar dados de leases e units para enriquecer os alertas
+  // Buscar dados de leases, units e payments para enriquecer os alertas
   const { data: leases } = useLeases()
   const { data: units } = useUnits()
+  const { data: payments } = useOverduePayments()
 
   const hasAlerts =
     alerts.overdue_payments.length > 0 ||
@@ -171,18 +185,21 @@ export function AlertsList({ alerts }: AlertsListProps) {
             type="overdue_payment"
             leases={leases}
             units={units}
+            payments={payments}
           />
           <AlertSection
             alerts={alerts.expiring_leases}
             type="expiring_lease"
             leases={leases}
             units={units}
+            payments={payments}
           />
           <AlertSection
             alerts={alerts.vacant_units}
             type="vacant_unit"
             leases={leases}
             units={units}
+            payments={payments}
           />
         </div>
       </CardContent>

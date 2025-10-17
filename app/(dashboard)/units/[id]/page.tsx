@@ -25,9 +25,20 @@ import { formatCurrency, formatDateTime, formatDate } from '@/src/lib/utils/form
 import type { UnitStatus } from '@/src/types/api/unit'
 
 export default function UnitDetailsPage() {
+  console.log('[UNIT DETAILS PAGE] Component mounting', {
+    timestamp: new Date().toISOString(),
+    hasAuthStorage: typeof window !== 'undefined' ? !!localStorage.getItem('auth-storage') : 'SSR',
+  })
+
   const params = useParams()
   const router = useRouter()
   const id = params.id as string
+
+  console.log('[UNIT DETAILS PAGE] Component initialized', {
+    unitId: id,
+    pathname: typeof window !== 'undefined' ? window.location.pathname : 'SSR',
+    href: typeof window !== 'undefined' ? window.location.href : 'SSR',
+  })
 
   const { data: unit, isLoading, error, refetch } = useUnit(id)
   const { data: leases } = useLeases({ unit_id: id })

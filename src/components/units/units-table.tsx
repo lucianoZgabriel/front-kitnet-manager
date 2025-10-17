@@ -137,7 +137,7 @@ export function UnitsTable({ units }: UnitsTableProps) {
                         </Link>
                       </Button>
                       <Button variant="ghost" size="sm" asChild>
-                        <Link href={`/units/${unit.id}?edit=true`}>
+                        <Link href={`/units/${unit.id}`}>
                           <Edit className="h-4 w-4" />
                         </Link>
                       </Button>

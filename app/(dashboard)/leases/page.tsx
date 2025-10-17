@@ -169,7 +169,7 @@ export default function LeasesPage() {
                           </Link>
                         </Button>
                         <Button variant="ghost" size="sm" asChild>
-                          <Link href={`/leases/${lease.id}?edit=true`}>
+                          <Link href={`/leases/${lease.id}`}>
                             <Edit className="h-4 w-4" />
                           </Link>
                         </Button>

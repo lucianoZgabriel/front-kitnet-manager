@@ -1,10 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useParams, useRouter, useSearchParams } from 'next/navigation'
-
-// Force dynamic rendering in production (fix Vercel deployment issue)
-export const dynamic = 'force-dynamic'
+import { useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useUnit, useDeleteUnit, useUpdateUnitStatus } from '@/src/hooks/use-units'
 import { useLeases } from '@/src/hooks/use-leases'
@@ -30,7 +27,6 @@ import type { UnitStatus } from '@/src/types/api/unit'
 export default function UnitDetailsPage() {
   const params = useParams()
   const router = useRouter()
-  const searchParams = useSearchParams()
   const id = params.id as string
 
   const { data: unit, isLoading, error, refetch } = useUnit(id)
@@ -41,22 +37,6 @@ export default function UnitDetailsPage() {
   const [isEditing, setIsEditing] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [selectedStatus, setSelectedStatus] = useState<UnitStatus | null>(null)
-
-  // Detectar query param ?edit=true para entrar direto no modo de edição
-  useEffect(() => {
-    const editParam = searchParams.get('edit')
-    console.log('[UNIT DETAILS] Query params changed', {
-      editParam,
-      willSetEditing: editParam === 'true',
-      currentPath: window.location.pathname,
-      fullUrl: window.location.href,
-    })
-
-    if (editParam === 'true') {
-      console.log('[UNIT DETAILS] Setting editing mode to true')
-      setIsEditing(true)
-    }
-  }, [searchParams])
 
   if (isLoading) {
     return (

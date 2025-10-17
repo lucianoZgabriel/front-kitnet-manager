@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
   Table,
   TableBody,
@@ -29,6 +29,7 @@ interface UnitsTableProps {
 }
 
 export function UnitsTable({ units }: UnitsTableProps) {
+  const router = useRouter()
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<UnitStatus | 'all'>('all')
   const [floorFilter, setFloorFilter] = useState<string>('all')
@@ -131,34 +132,35 @@ export function UnitsTable({ units }: UnitsTableProps) {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1">
-                      <Button variant="ghost" size="sm" asChild>
-                        <Link
-                          href={`/units/${unit.id}`}
-                          onClick={() => {
-                            console.log('[UNITS TABLE] Eye icon clicked', {
-                              unitId: unit.id,
-                              href: `/units/${unit.id}`,
-                              timestamp: new Date().toISOString(),
-                            })
-                          }}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Link>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          console.log('[UNITS TABLE] Eye icon clicked (router.push)', {
+                            unitId: unit.id,
+                            href: `/units/${unit.id}`,
+                            timestamp: new Date().toISOString(),
+                            hasAuthStorage: !!localStorage.getItem('auth-storage'),
+                          })
+                          router.push(`/units/${unit.id}`)
+                        }}
+                      >
+                        <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" asChild>
-                        <Link
-                          href={`/units/${unit.id}`}
-                          onClick={() => {
-                            console.log('[UNITS TABLE] Edit icon clicked', {
-                              unitId: unit.id,
-                              href: `/units/${unit.id}`,
-                              timestamp: new Date().toISOString(),
-                              hasAuthStorage: !!localStorage.getItem('auth-storage'),
-                            })
-                          }}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Link>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          console.log('[UNITS TABLE] Edit icon clicked (router.push)', {
+                            unitId: unit.id,
+                            href: `/units/${unit.id}`,
+                            timestamp: new Date().toISOString(),
+                            hasAuthStorage: !!localStorage.getItem('auth-storage'),
+                          })
+                          router.push(`/units/${unit.id}`)
+                        }}
+                      >
+                        <Edit className="h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>

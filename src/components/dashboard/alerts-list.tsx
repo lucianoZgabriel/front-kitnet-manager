@@ -1,20 +1,89 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/components/ui/card'
 import { Badge } from '@/src/components/ui/badge'
-import { Alerts } from '@/src/types/api/dashboard'
+import { Alerts, Alert } from '@/src/types/api/dashboard'
 import { AlertTriangle, Clock, Home, DollarSign } from 'lucide-react'
-import { formatCurrency, formatDate } from '@/src/lib/utils/format'
 
 interface AlertsListProps {
   alerts: Alerts
 }
 
-export function AlertsList({ alerts }: AlertsListProps) {
-  // Debug: log dos dados recebidos
-  console.log('AlertsList - Dados recebidos:', alerts)
-  if (alerts.overdue_payments.length > 0) {
-    console.log('AlertsList - Primeiro pagamento atrasado:', alerts.overdue_payments[0])
-  }
+const severityConfig = {
+  high: {
+    variant: 'destructive' as const,
+    className: 'border-red-200 bg-red-50/50',
+    iconColor: 'text-red-600',
+  },
+  medium: {
+    variant: 'default' as const,
+    className: 'border-yellow-200 bg-yellow-50/50',
+    iconColor: 'text-yellow-600',
+  },
+  low: {
+    variant: 'secondary' as const,
+    className: 'border-gray-200 bg-gray-50/50',
+    iconColor: 'text-gray-600',
+  },
+}
 
+const typeConfig = {
+  overdue_payment: {
+    icon: DollarSign,
+    label: 'Atrasado',
+    sectionTitle: 'Pagamentos Atrasados',
+    titleColor: 'text-red-700',
+  },
+  expiring_lease: {
+    icon: Clock,
+    label: 'Expirando',
+    sectionTitle: 'Contratos Expirando em Breve',
+    titleColor: 'text-yellow-700',
+  },
+  vacant_unit: {
+    icon: Home,
+    label: 'Disponível',
+    sectionTitle: 'Unidades Disponíveis',
+    titleColor: 'text-blue-700',
+  },
+}
+
+function renderAlertSection(
+  alerts: Alert[],
+  type: 'overdue_payment' | 'expiring_lease' | 'vacant_unit'
+) {
+  if (alerts.length === 0) return null
+
+  const config = typeConfig[type]
+  const Icon = config.icon
+
+  return (
+    <div>
+      <h3 className={`mb-2 text-sm font-semibold ${config.titleColor}`}>{config.sectionTitle}</h3>
+      <div className="space-y-2">
+        {alerts.map((alert, index) => {
+          const severityStyle = severityConfig[alert.severity]
+
+          return (
+            <div
+              key={alert.entity_id || `${type}-${index}`}
+              className={`flex items-start gap-3 rounded-lg border p-3 ${severityStyle.className}`}
+            >
+              <Icon className={`mt-0.5 h-5 w-5 flex-shrink-0 ${severityStyle.iconColor}`} />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-gray-900">{alert.title}</p>
+                <p className="mt-1 text-xs text-gray-600">{alert.description}</p>
+              </div>
+              <Badge variant={severityStyle.variant} className="text-xs">
+                {config.label}
+              </Badge>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+export function AlertsList({ alerts }: AlertsListProps) {
   const hasAlerts =
     alerts.overdue_payments.length > 0 ||
     alerts.expiring_leases.length > 0 ||
@@ -53,99 +122,9 @@ export function AlertsList({ alerts }: AlertsListProps) {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {/* Pagamentos Atrasados */}
-          {alerts.overdue_payments.length > 0 && (
-            <div>
-              <h3 className="mb-2 text-sm font-semibold text-red-700">Pagamentos Atrasados</h3>
-              <div className="space-y-2">
-                {alerts.overdue_payments.map((payment, index) => (
-                  <div
-                    key={payment.payment_id || `overdue-${index}`}
-                    className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50/50 p-3"
-                  >
-                    <DollarSign className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600" />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-gray-900">
-                        Unidade {payment.unit_number || '?'} -{' '}
-                        {payment.tenant_name || 'Nome não disponível'}
-                      </p>
-                      <p className="mt-1 text-xs text-gray-600">
-                        Valor: {formatCurrency(payment.amount || 0)} • {payment.days_overdue || 0}{' '}
-                        dias de atraso
-                      </p>
-                    </div>
-                    <Badge variant="destructive" className="text-xs">
-                      Atrasado
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Contratos Expirando */}
-          {alerts.expiring_leases.length > 0 && (
-            <div>
-              <h3 className="mb-2 text-sm font-semibold text-yellow-700">
-                Contratos Expirando em Breve
-              </h3>
-              <div className="space-y-2">
-                {alerts.expiring_leases.map((lease) => (
-                  <div
-                    key={lease.lease_id}
-                    className="flex items-start gap-3 rounded-lg border border-yellow-200 bg-yellow-50/50 p-3"
-                  >
-                    <Clock className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-600" />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-gray-900">
-                        Unidade {lease.unit_number} - {lease.tenant_name}
-                      </p>
-                      <p className="mt-1 text-xs text-gray-600">
-                        Expira em: {formatDate(lease.end_date)} •{' '}
-                        {lease.days_until_expiry === 0
-                          ? 'Expira hoje'
-                          : `${lease.days_until_expiry} dias restantes`}
-                      </p>
-                    </div>
-                    <Badge variant="default" className="bg-yellow-100 text-xs text-yellow-800">
-                      Expirando
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Unidades Vagas */}
-          {alerts.vacant_units.length > 0 && (
-            <div>
-              <h3 className="mb-2 text-sm font-semibold text-blue-700">Unidades Disponíveis</h3>
-              <div className="space-y-2">
-                {alerts.vacant_units.map((unit) => (
-                  <div
-                    key={unit.unit_id}
-                    className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50/50 p-3"
-                  >
-                    <Home className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600" />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-gray-900">
-                        Unidade {unit.unit_number}
-                      </p>
-                      <p className="mt-1 text-xs text-gray-600">
-                        Status: {unit.status} •{' '}
-                        {unit.days_vacant === 0
-                          ? 'Disponível hoje'
-                          : `${unit.days_vacant} dias vaga`}
-                      </p>
-                    </div>
-                    <Badge variant="secondary" className="text-xs">
-                      Disponível
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {renderAlertSection(alerts.overdue_payments, 'overdue_payment')}
+          {renderAlertSection(alerts.expiring_leases, 'expiring_lease')}
+          {renderAlertSection(alerts.vacant_units, 'vacant_unit')}
         </div>
       </CardContent>
     </Card>

@@ -1,7 +1,13 @@
+import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/components/ui/card'
 import { Badge } from '@/src/components/ui/badge'
+import { Button } from '@/src/components/ui/button'
 import { Alerts, Alert } from '@/src/types/api/dashboard'
-import { AlertTriangle, Clock, Home, DollarSign } from 'lucide-react'
+import { AlertTriangle, Clock, Home, DollarSign, ExternalLink } from 'lucide-react'
+import { useLeases } from '@/src/hooks/use-leases'
+import { useUnits } from '@/src/hooks/use-units'
+import type { Lease } from '@/src/types/api/lease'
+import type { Unit } from '@/src/types/api/unit'
 
 interface AlertsListProps {
   alerts: Alerts
@@ -46,14 +52,29 @@ const typeConfig = {
   },
 }
 
-function renderAlertSection(
-  alerts: Alert[],
+interface AlertSectionProps {
+  alerts: Alert[]
   type: 'overdue_payment' | 'expiring_lease' | 'vacant_unit'
-) {
+  leases?: Lease[]
+  units?: Unit[]
+}
+
+function AlertSection({ alerts, type, leases, units }: AlertSectionProps) {
   if (alerts.length === 0) return null
 
   const config = typeConfig[type]
   const Icon = config.icon
+
+  // Função para buscar número da unidade pelo entity_id (lease_id)
+  const getUnitNumber = (entityId: string): string => {
+    if (!leases || !units) return '?'
+
+    const lease = leases.find((l) => l.id === entityId)
+    if (!lease) return '?'
+
+    const unit = units.find((u) => u.id === lease.unit_id)
+    return unit?.number || '?'
+  }
 
   return (
     <div>
@@ -61,6 +82,8 @@ function renderAlertSection(
       <div className="space-y-2">
         {alerts.map((alert, index) => {
           const severityStyle = severityConfig[alert.severity]
+          const unitNumber = type === 'overdue_payment' ? getUnitNumber(alert.entity_id) : null
+          const leaseId = type === 'overdue_payment' ? alert.entity_id : null
 
           return (
             <div
@@ -69,12 +92,29 @@ function renderAlertSection(
             >
               <Icon className={`mt-0.5 h-5 w-5 flex-shrink-0 ${severityStyle.iconColor}`} />
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-gray-900">{alert.title}</p>
-                <p className="mt-1 text-xs text-gray-600">{alert.description}</p>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900">
+                      {unitNumber && `Unidade ${unitNumber} • `}
+                      {alert.title}
+                    </p>
+                    <p className="mt-1 text-xs text-gray-600">{alert.description}</p>
+                  </div>
+                  <Badge variant={severityStyle.variant} className="text-xs">
+                    {config.label}
+                  </Badge>
+                </div>
+                {leaseId && (
+                  <div className="mt-2">
+                    <Button variant="link" size="sm" asChild className="h-auto p-0 text-xs">
+                      <Link href={`/leases/${leaseId}`}>
+                        Ver Contrato
+                        <ExternalLink className="ml-1 h-3 w-3" />
+                      </Link>
+                    </Button>
+                  </div>
+                )}
               </div>
-              <Badge variant={severityStyle.variant} className="text-xs">
-                {config.label}
-              </Badge>
             </div>
           )
         })}
@@ -84,6 +124,10 @@ function renderAlertSection(
 }
 
 export function AlertsList({ alerts }: AlertsListProps) {
+  // Buscar dados de leases e units para enriquecer os alertas
+  const { data: leases } = useLeases()
+  const { data: units } = useUnits()
+
   const hasAlerts =
     alerts.overdue_payments.length > 0 ||
     alerts.expiring_leases.length > 0 ||
@@ -122,9 +166,24 @@ export function AlertsList({ alerts }: AlertsListProps) {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {renderAlertSection(alerts.overdue_payments, 'overdue_payment')}
-          {renderAlertSection(alerts.expiring_leases, 'expiring_lease')}
-          {renderAlertSection(alerts.vacant_units, 'vacant_unit')}
+          <AlertSection
+            alerts={alerts.overdue_payments}
+            type="overdue_payment"
+            leases={leases}
+            units={units}
+          />
+          <AlertSection
+            alerts={alerts.expiring_leases}
+            type="expiring_lease"
+            leases={leases}
+            units={units}
+          />
+          <AlertSection
+            alerts={alerts.vacant_units}
+            type="vacant_unit"
+            leases={leases}
+            units={units}
+          />
         </div>
       </CardContent>
     </Card>

@@ -122,7 +122,7 @@ export default function TenantsPage() {
                           </Link>
                         </Button>
                         <Button variant="ghost" size="sm" asChild>
-                          <Link href={`/tenants/${tenant.id}?edit=true`}>
+                          <Link href={`/tenants/${tenant.id}`}>
                             <Edit className="h-4 w-4" />
                           </Link>
                         </Button>

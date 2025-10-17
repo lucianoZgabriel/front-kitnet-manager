@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import {
   Table,
   TableBody,
@@ -29,7 +28,6 @@ interface UnitsTableProps {
 }
 
 export function UnitsTable({ units }: UnitsTableProps) {
-  const router = useRouter()
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<UnitStatus | 'all'>('all')
   const [floorFilter, setFloorFilter] = useState<string>('all')
@@ -136,13 +134,13 @@ export function UnitsTable({ units }: UnitsTableProps) {
                         variant="ghost"
                         size="sm"
                         onClick={() => {
-                          console.log('[UNITS TABLE] Eye icon clicked (router.push)', {
+                          console.log('[UNITS TABLE] Eye icon clicked (window.location)', {
                             unitId: unit.id,
                             href: `/units/${unit.id}`,
                             timestamp: new Date().toISOString(),
                             hasAuthStorage: !!localStorage.getItem('auth-storage'),
                           })
-                          router.push(`/units/${unit.id}`)
+                          window.location.href = `/units/${unit.id}`
                         }}
                       >
                         <Eye className="h-4 w-4" />
@@ -151,13 +149,13 @@ export function UnitsTable({ units }: UnitsTableProps) {
                         variant="ghost"
                         size="sm"
                         onClick={() => {
-                          console.log('[UNITS TABLE] Edit icon clicked (router.push)', {
+                          console.log('[UNITS TABLE] Edit icon clicked (window.location)', {
                             unitId: unit.id,
                             href: `/units/${unit.id}`,
                             timestamp: new Date().toISOString(),
                             hasAuthStorage: !!localStorage.getItem('auth-storage'),
                           })
-                          router.push(`/units/${unit.id}`)
+                          window.location.href = `/units/${unit.id}`
                         }}
                       >
                         <Edit className="h-4 w-4" />

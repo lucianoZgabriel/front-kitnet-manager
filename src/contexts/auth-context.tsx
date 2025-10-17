@@ -34,15 +34,28 @@ export function AuthProvider({ children }: AuthProviderProps) {
       return
     }
 
+    console.log('[AUTH CONTEXT] Initializing auth context', {
+      hasToken: !!token,
+      hasUser: !!user,
+      _hasHydrated,
+      hasInitialized,
+    })
+
     const initializeAuth = async () => {
       if (token) {
+        console.log('[AUTH CONTEXT] Token found, fetching current user')
         try {
           const response = await authService.getCurrentUser()
           if (response.success && response.data) {
+            console.log('[AUTH CONTEXT] User fetched successfully', {
+              userId: response.data.id,
+              username: response.data.username,
+            })
             setAuth(response.data, token)
           }
           // Se falhar, não fazer nada - manter dados em cache
-        } catch {
+        } catch (error) {
+          console.error('[AUTH CONTEXT] Error fetching current user', error)
           // NÃO limpar auth automaticamente - pode ser erro temporário (500, network, etc)
           // Se for 401, o interceptor do axios já vai redirecionar
         } finally {
@@ -51,6 +64,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           setHasInitialized(true)
         }
       } else {
+        console.log('[AUTH CONTEXT] No token found, skipping user fetch')
         setIsLoading(false)
         setHasInitialized(true)
       }

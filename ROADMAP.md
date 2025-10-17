@@ -547,7 +547,7 @@ Roadmap completo para desenvolvimento do frontend do Kitnet Manager, organizado 
 
 ---
 
-## Sprint 8: Polish & Testing (Semana 9)
+## Sprint 8: Polish & Testing (Semana 9) 🔄
 
 ### Objetivos
 - Refinamento de UI/UX
@@ -558,10 +558,13 @@ Roadmap completo para desenvolvimento do frontend do Kitnet Manager, organizado 
 ### Tarefas
 
 #### UI/UX Polish
-- [ ] Revisar todas as páginas para consistência
-- [ ] Melhorar mensagens de erro
-- [ ] Adicionar skeletons/loading states
-- [ ] Melhorar empty states
+- [x] Revisar todas as páginas para consistência
+- [x] Melhorar mensagens de erro
+- [x] Adicionar skeletons/loading states
+- [x] Melhorar empty states
+- [x] Simplificar interface de pagamentos (remover complexidade de juros)
+- [x] Implementar lookup de unidades em tabelas de pagamentos
+- [x] Corrigir erro 400 ao registrar pagamentos (formato de data ISO)
 - [ ] Adicionar animações suaves (framer-motion - opcional)
 - [ ] Revisar acessibilidade (keyboard navigation)
 
@@ -578,12 +581,18 @@ Roadmap completo para desenvolvimento do frontend do Kitnet Manager, organizado 
 - [ ] Revisar React Query cache times
 - [ ] Adicionar `React.memo` onde apropriado
 
+#### Backend Improvements
+- [x] Gerar todos os 6 aluguéis mensais na criação de contratos (antes: apenas 1)
+- [x] Modificar RenewLease para também gerar todos os 6 aluguéis
+- [x] Atualizar testes do backend (100% passando)
+- [x] Criar PR no backend com melhorias
+
 #### Testing
 - [ ] Setup Vitest
 - [ ] Testes unitários para utilities
   - formatCPF, validateCPF
   - formatCurrency
-  - calculateLateFee
+  - calculateLateFee (removido)
 - [ ] Setup Testing Library
 - [ ] Testes de componentes críticos
   - LoginForm
@@ -601,56 +610,273 @@ Roadmap completo para desenvolvimento do frontend do Kitnet Manager, organizado 
 - [ ] Criar CONTRIBUTING.md
 - [ ] Adicionar comentários JSDoc em funções complexas
 
-### Entregáveis
-✅ UI polida e consistente
-✅ App totalmente responsivo
-✅ Testes básicos implementados
-✅ Performance otimizada
-✅ Documentação atualizada
+### Entregáveis (Parcial)
+✅ **UI/UX Melhorias:**
+  - Interface de pagamentos simplificada (sem juros)
+  - Lookup de unidades implementado (mostra "Kit 101" ao invés de UUID)
+  - Erro 400 corrigido (formato de data ISO)
+  - Mensagens de erro melhoradas
+  - Loading states e empty states consistentes
+
+✅ **Backend Melhorias:**
+  - Geração de todos os 6 aluguéis automática
+  - Testes 100% passando
+  - PR #6 criado e pronto para merge
+
+✅ **Frontend Melhorias:**
+  - Arquitetura preparada para filtros futuros
+  - Performance otimizada (2 requisições, cache eficiente)
+  - PR #9 criado e pronto para merge
+
+🔄 **Pendente:**
+  - Testes automatizados
+  - Responsividade mobile completa
+  - Performance audit
+  - Documentação
+
+**Status:** Em andamento (15/10/2025)
+**Branches:**
+- Backend: `fix/generate-all-monthly-rent-payments` → PR #6
+- Frontend: `fix/payment-date-format-and-improvements` → PR #9
 
 ---
 
-## Sprint 9: Production Ready (Semana 10)
+## Sprint 9: Production Ready (Semana 10) 🚀
 
 ### Objetivos
-- Preparação para produção
-- Deploy final
-- Monitoramento
-- Documentação de usuário
+- Preparação para produção na Vercel
+- Deploy inicial básico (fast track)
+- Configuração essencial
+- Melhorias incrementais (opcional)
 
-### Tarefas
+### Estratégia: Deploy Rápido e Incremental
 
-#### Production Checklist
-- [ ] Configurar variáveis de ambiente de produção
-- [ ] Configurar domínio customizado (opcional)
-- [ ] Setup error tracking (Sentry - opcional)
-- [ ] Setup analytics (Vercel Analytics)
-- [ ] Configurar Web Vitals
-- [ ] Testar performance com Lighthouse
-- [ ] Security audit
+**Fase 1: Deploy Básico** (Hoje - 15 min) ✅
+- [x] Testar build localmente
+- [x] Criar `vercel.json` com configurações otimizadas
+- [x] Criar `DEPLOYMENT.md` (guia completo)
+- [x] Atualizar `ROADMAP.md`
 
-#### Deployment
-- [ ] Deploy final para produção
+**Fase 2: Deploy na Vercel** (Hoje - 30 min)
+- [ ] Fazer push do código para repositório remoto
+- [ ] Conectar repositório na Vercel (via interface web)
+- [ ] Configurar variáveis de ambiente
+  - `NEXT_PUBLIC_API_URL`
+  - `NEXT_PUBLIC_APP_NAME`
+  - `NEXT_PUBLIC_APP_VERSION`
+- [ ] Deploy inicial (automático)
 - [ ] Smoke tests em produção
-- [ ] Configurar monitoring/alertas
-- [ ] Backup plan (rollback strategy)
+  - Login funcionando
+  - Dashboard carregando
+  - CRUD básico (unidades, inquilinos)
+  - Integração com API Railway
+
+**Fase 3: Melhorias Incrementais** (Próximos dias - opcional)
+- [ ] Configurar domínio customizado (opcional)
+- [ ] Ativar Vercel Analytics (gratuito)
+- [ ] Ativar Speed Insights (gratuito)
+- [ ] Testar performance com Lighthouse
+- [ ] Setup error tracking (Sentry - opcional)
+- [ ] Configurar alertas de uptime (opcional)
+
+### Tarefas Detalhadas
+
+#### Deploy Básico ✅
+- [x] **Verificar build local**
+  - Build passou com sucesso
+  - 22 rotas geradas
+  - Bundle size: ~100KB (excelente)
+  - Warning sobre lockfiles (não crítico)
+
+- [x] **Criar `vercel.json`**
+  - Framework: Next.js
+  - Região: `gru1` (São Paulo - melhor latência Brasil)
+  - Security headers configurados
+  - Rewrites para SPA routing
+
+- [x] **Criar `DEPLOYMENT.md`**
+  - Guia completo passo a passo
+  - Método via interface web (recomendado)
+  - Método via CLI (avançado)
+  - Configuração de domínio customizado
+  - Troubleshooting comum
+  - Checklist de segurança
+  - Performance otimização
+
+#### Deploy na Vercel
+- [ ] **Preparar repositório**
+  ```bash
+  git add vercel.json DEPLOYMENT.md ROADMAP.md
+  git commit -m "chore: prepare for Vercel deployment"
+  git push origin main
+  ```
+
+- [ ] **Deploy via Vercel Interface Web** (Método Recomendado)
+  1. Acessar [vercel.com/new](https://vercel.com/new)
+  2. Login com GitHub
+  3. Importar repositório `front-kitnet-manager`
+  4. Configurar environment variables
+  5. Deploy!
+
+- [ ] **Configurar Variáveis de Ambiente**
+  | Variável | Valor | Ambiente |
+  |----------|-------|----------|
+  | `NEXT_PUBLIC_API_URL` | `https://kitnet-manager-production.up.railway.app/api/v1` | Production, Preview, Development |
+  | `NEXT_PUBLIC_APP_NAME` | `Kitnet Manager` | Production, Preview, Development |
+  | `NEXT_PUBLIC_APP_VERSION` | `1.0.0` | Production, Preview, Development |
+
+- [ ] **Smoke Tests em Produção**
+  - [ ] Aplicação carrega sem erros
+  - [ ] Login funciona (admin/admin123)
+  - [ ] Dashboard mostra dados da API
+  - [ ] Criar unidade funciona
+  - [ ] Criar inquilino funciona
+  - [ ] Criar contrato funciona
+  - [ ] Marcar pagamento como pago funciona
+  - [ ] Relatórios carregam
+  - [ ] Configurações funcionam
+  - [ ] Mobile responsivo
+  - [ ] Sem erros no console
+
+#### Melhorias Pós-Deploy (Opcional)
+- [ ] **Domínio Customizado**
+  - Comprar domínio (Registro.br, GoDaddy, etc)
+  - Configurar DNS (A record ou CNAME)
+  - Adicionar na Vercel
+  - Aguardar propagação (5-15 min)
+
+- [ ] **Analytics & Monitoring**
+  - [ ] Ativar Vercel Analytics (gratuito)
+  - [ ] Ativar Speed Insights
+    ```bash
+    npm install @vercel/speed-insights
+    ```
+  - [ ] Configurar Web Vitals tracking
+
+- [ ] **Error Tracking (Sentry - opcional)**
+  ```bash
+  npm install @sentry/nextjs
+  npx @sentry/wizard@latest -i nextjs
+  ```
+
+- [ ] **Performance Audit**
+  - [ ] Rodar Lighthouse (score > 90)
+  - [ ] Analisar bundle size
+  - [ ] Otimizar imagens se necessário
+  - [ ] Verificar Core Web Vitals
+
+- [ ] **Security Audit**
+  - [ ] Headers de segurança (já configurados)
+  - [ ] HTTPS funcionando (automático na Vercel)
+  - [ ] Variáveis sensíveis não expostas
+  - [ ] Rate limiting na API (backend)
+
+#### CI/CD - Configuração
+- [ ] **Branch Protection**
+  - Proteger branch `main`
+  - Require PR reviews
+  - Require status checks
+
+- [ ] **Deploy Automático**
+  - ✅ Push para `main` → Deploy Production (já configurado pela Vercel)
+  - ✅ Abrir PR → Preview deploy (já configurado pela Vercel)
+  - ✅ Deploy apenas se build passar (já configurado pela Vercel)
 
 #### Documentation
-- [ ] Manual do usuário (PDF ou wiki)
-- [ ] Video tutorial (opcional)
-- [ ] FAQ
-- [ ] Troubleshooting guide
+- [ ] Atualizar README.md com:
+  - [ ] URL de produção
+  - [ ] Credenciais de demo
+  - [ ] Screenshots da aplicação
+  - [ ] Status badges (build, deploy)
 
-#### Training
-- [ ] Treinamento para admin
-- [ ] Treinamento para managers
-- [ ] Documentar workflows principais
+- [ ] Criar USER_GUIDE.md (opcional)
+  - [ ] Como fazer login
+  - [ ] Como gerenciar unidades
+  - [ ] Como gerenciar inquilinos
+  - [ ] Como criar contratos
+  - [ ] Como processar pagamentos
+  - [ ] Como gerar relatórios
+
+- [ ] Criar FAQ.md (opcional)
+  - [ ] Problemas comuns e soluções
+  - [ ] Perguntas frequentes de usuários
+
+### Arquivos Criados
+
+✅ **[vercel.json](vercel.json)**
+- Configuração otimizada para Next.js
+- Região São Paulo (gru1)
+- Security headers
+- SPA routing rewrites
+
+✅ **[DEPLOYMENT.md](DEPLOYMENT.md)**
+- Guia completo de deploy (3500+ palavras)
+- Método via interface web
+- Método via CLI
+- Configuração de domínio
+- Troubleshooting
+- Performance otimização
+- Security checklist
 
 ### Entregáveis
-✅ Aplicação em produção
-✅ Monitoring configurado
-✅ Documentação de usuário completa
-✅ Usuários treinados
+
+**Fase 1 (Completa):** ✅
+- ✅ Build testado localmente
+- ✅ `vercel.json` criado
+- ✅ `DEPLOYMENT.md` criado
+- ✅ Roadmap atualizado
+
+**Fase 2 (Pendente):**
+- [ ] Aplicação em produção na Vercel
+- [ ] URL pública acessível
+- [ ] Smoke tests passando
+- [ ] Integração com API funcionando
+
+**Fase 3 (Opcional):**
+- [ ] Analytics configurado
+- [ ] Performance otimizado (Lighthouse > 90)
+- [ ] Monitoring ativo
+- [ ] Domínio customizado (se aplicável)
+
+### Métricas de Sucesso
+
+#### Performance (Target)
+- **Lighthouse Score:** > 90
+- **First Contentful Paint:** < 1.5s
+- **Time to Interactive:** < 3s
+- **Bundle Size:** < 300KB (✅ atual: ~100KB)
+
+#### Deployment
+- **Build Time:** < 3 min (✅ atual: ~3.5s compile + ~2min total)
+- **Deploy Time:** < 5 min
+- **Uptime:** > 99.9%
+
+#### User Experience
+- **Login Response:** < 1s
+- **Dashboard Load:** < 2s
+- **API Response:** < 500ms
+- **Mobile Score:** > 85
+
+### Próximos Passos Imediatos
+
+1. **Fazer commit dos novos arquivos:**
+   ```bash
+   git add vercel.json DEPLOYMENT.md ROADMAP.md
+   git commit -m "chore: prepare for Vercel deployment"
+   git push origin main
+   ```
+
+2. **Seguir o guia [DEPLOYMENT.md](DEPLOYMENT.md)** para fazer o deploy
+
+3. **Testar em produção** seguindo o checklist de smoke tests
+
+4. **Considerar melhorias opcionais** conforme necessidade
+
+---
+
+**Status:** Fase 1 completa ✅ | Fase 2 pronta para começar
+**Data:** 17/10/2025
+**Branch:** fix/payment-date-format-and-improvements (merge para main antes do deploy)
 
 ---
 

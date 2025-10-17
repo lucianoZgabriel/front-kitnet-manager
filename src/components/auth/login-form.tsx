@@ -111,11 +111,6 @@ export function LoginForm() {
             </Button>
           </form>
         </Form>
-        <div className="bg-muted/50 mt-6 rounded-lg border p-3 text-center">
-          <p className="text-muted-foreground text-sm">
-            <span className="font-medium">Credenciais padrão:</span> admin / admin123
-          </p>
-        </div>
       </CardContent>
     </Card>
   )

@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/src/components/ui/ca
 import { Badge } from '@/src/components/ui/badge'
 import { Button } from '@/src/components/ui/button'
 import { Alerts, Alert } from '@/src/types/api/dashboard'
-import { AlertTriangle, Clock, Home, DollarSign, ExternalLink } from 'lucide-react'
+import { AlertTriangle, Clock, Home, DollarSign } from 'lucide-react'
 import { useLeases } from '@/src/hooks/use-leases'
 import { useUnits } from '@/src/hooks/use-units'
 import { useOverduePayments } from '@/src/hooks/use-payments'
@@ -120,10 +120,7 @@ function AlertSection({ alerts, type, leases, units, payments }: AlertSectionPro
                 {paymentInfo?.leaseId && (
                   <div className="mt-2">
                     <Button variant="link" size="sm" asChild className="h-auto p-0 text-xs">
-                      <Link href={`/leases/${paymentInfo.leaseId}`}>
-                        Ver Contrato
-                        <ExternalLink className="ml-1 h-3 w-3" />
-                      </Link>
+                      <Link href={`/leases/${paymentInfo.leaseId}`}>Ver Contrato</Link>
                     </Button>
                   </div>
                 )}

@@ -1,10 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useParams, useRouter, useSearchParams } from 'next/navigation'
-
-// Force dynamic rendering in production (fix Vercel deployment issue)
-export const dynamic = 'force-dynamic'
+import { useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useTenant, useDeleteTenant } from '@/src/hooks/use-tenants'
 import { useLeases } from '@/src/hooks/use-leases'
@@ -27,7 +24,6 @@ import {
 export default function TenantDetailsPage() {
   const params = useParams()
   const router = useRouter()
-  const searchParams = useSearchParams()
   const id = params.id as string
 
   const { data: tenant, isLoading, error, refetch } = useTenant(id)
@@ -36,13 +32,6 @@ export default function TenantDetailsPage() {
 
   const [isEditing, setIsEditing] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-
-  // Detectar query param ?edit=true para entrar direto no modo de edição
-  useEffect(() => {
-    if (searchParams.get('edit') === 'true') {
-      setIsEditing(true)
-    }
-  }, [searchParams])
 
   if (isLoading) {
     return (

@@ -1,45 +1,24 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/components/ui/card'
 import { Badge } from '@/src/components/ui/badge'
-import { Alert } from '@/src/types/api/dashboard'
-import { cn } from '@/src/lib/utils/cn'
-import { AlertTriangle, Clock, Home, DollarSign, FileText, Info } from 'lucide-react'
+import { Alerts } from '@/src/types/api/dashboard'
+import { AlertTriangle, Clock, Home, DollarSign } from 'lucide-react'
+import { formatCurrency, formatDate } from '@/src/lib/utils/format'
 
 interface AlertsListProps {
-  alerts: Alert[]
-}
-
-const severityConfig = {
-  high: {
-    variant: 'destructive' as const,
-    label: 'Alta',
-  },
-  medium: {
-    variant: 'default' as const,
-    label: 'Média',
-  },
-  low: {
-    variant: 'secondary' as const,
-    label: 'Baixa',
-  },
-}
-
-const typeIcons = {
-  contract_expiring: Clock,
-  payment_overdue: DollarSign,
-  unit_maintenance: Home,
-  lease_expiring: FileText,
-  default: Info,
+  alerts: Alerts
 }
 
 export function AlertsList({ alerts }: AlertsListProps) {
-  // Garantir que alerts é um array
-  const alertsArray = Array.isArray(alerts) ? alerts : []
+  const hasAlerts =
+    alerts.overdue_payments.length > 0 ||
+    alerts.expiring_leases.length > 0 ||
+    alerts.vacant_units.length > 0
 
-  if (alertsArray.length === 0) {
+  if (!hasAlerts) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Alertas</CardTitle>
+          <CardTitle className="text-lg">Alertas e Notificações</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center py-8 text-center">
@@ -54,54 +33,112 @@ export function AlertsList({ alerts }: AlertsListProps) {
     )
   }
 
-  // Ordenar por severidade (high > medium > low)
-  const sortedAlerts = [...alertsArray].sort((a, b) => {
-    const severityOrder = { high: 0, medium: 1, low: 2 }
-    return severityOrder[a.severity] - severityOrder[b.severity]
-  })
-
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Alertas</CardTitle>
+        <CardTitle className="text-lg">
+          Alertas e Notificações
+          {alerts.total_alerts > 0 && (
+            <Badge variant="destructive" className="ml-2">
+              {alerts.total_alerts}
+            </Badge>
+          )}
+        </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3">
-          {sortedAlerts.map((alert, index) => {
-            const IconComponent =
-              typeIcons[alert.type as keyof typeof typeIcons] || typeIcons.default
-            const config = severityConfig[alert.severity]
-
-            return (
-              <div
-                key={index}
-                className={cn(
-                  'flex items-start gap-3 rounded-lg border p-3 transition-colors',
-                  alert.severity === 'high' && 'border-red-200 bg-red-50/50',
-                  alert.severity === 'medium' && 'border-yellow-200 bg-yellow-50/50',
-                  alert.severity === 'low' && 'border-gray-200 bg-gray-50/50'
-                )}
-              >
-                <IconComponent
-                  className={cn(
-                    'mt-0.5 h-5 w-5 flex-shrink-0',
-                    alert.severity === 'high' && 'text-red-600',
-                    alert.severity === 'medium' && 'text-yellow-600',
-                    alert.severity === 'low' && 'text-gray-600'
-                  )}
-                />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-gray-900">{alert.message}</p>
-                  <div className="mt-1 flex items-center gap-2">
-                    <Badge variant={config.variant} className="text-xs">
-                      {config.label}
+        <div className="space-y-4">
+          {/* Pagamentos Atrasados */}
+          {alerts.overdue_payments.length > 0 && (
+            <div>
+              <h3 className="mb-2 text-sm font-semibold text-red-700">Pagamentos Atrasados</h3>
+              <div className="space-y-2">
+                {alerts.overdue_payments.map((payment) => (
+                  <div
+                    key={payment.payment_id}
+                    className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50/50 p-3"
+                  >
+                    <DollarSign className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-gray-900">
+                        Unidade {payment.unit_number} - {payment.tenant_name}
+                      </p>
+                      <p className="mt-1 text-xs text-gray-600">
+                        Valor: {formatCurrency(payment.amount)} • {payment.days_overdue} dias de
+                        atraso
+                      </p>
+                    </div>
+                    <Badge variant="destructive" className="text-xs">
+                      Atrasado
                     </Badge>
-                    <span className="text-muted-foreground text-xs">{alert.entity_type}</span>
                   </div>
-                </div>
+                ))}
               </div>
-            )
-          })}
+            </div>
+          )}
+
+          {/* Contratos Expirando */}
+          {alerts.expiring_leases.length > 0 && (
+            <div>
+              <h3 className="mb-2 text-sm font-semibold text-yellow-700">
+                Contratos Expirando em Breve
+              </h3>
+              <div className="space-y-2">
+                {alerts.expiring_leases.map((lease) => (
+                  <div
+                    key={lease.lease_id}
+                    className="flex items-start gap-3 rounded-lg border border-yellow-200 bg-yellow-50/50 p-3"
+                  >
+                    <Clock className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-600" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-gray-900">
+                        Unidade {lease.unit_number} - {lease.tenant_name}
+                      </p>
+                      <p className="mt-1 text-xs text-gray-600">
+                        Expira em: {formatDate(lease.end_date)} •{' '}
+                        {lease.days_until_expiry === 0
+                          ? 'Expira hoje'
+                          : `${lease.days_until_expiry} dias restantes`}
+                      </p>
+                    </div>
+                    <Badge variant="default" className="bg-yellow-100 text-xs text-yellow-800">
+                      Expirando
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Unidades Vagas */}
+          {alerts.vacant_units.length > 0 && (
+            <div>
+              <h3 className="mb-2 text-sm font-semibold text-blue-700">Unidades Disponíveis</h3>
+              <div className="space-y-2">
+                {alerts.vacant_units.map((unit) => (
+                  <div
+                    key={unit.unit_id}
+                    className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50/50 p-3"
+                  >
+                    <Home className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-gray-900">
+                        Unidade {unit.unit_number}
+                      </p>
+                      <p className="mt-1 text-xs text-gray-600">
+                        Status: {unit.status} •{' '}
+                        {unit.days_vacant === 0
+                          ? 'Disponível hoje'
+                          : `${unit.days_vacant} dias vaga`}
+                      </p>
+                    </div>
+                    <Badge variant="secondary" className="text-xs">
+                      Disponível
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

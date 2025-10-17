@@ -128,8 +128,10 @@ export function useCancelLease() {
 
   return useMutation({
     mutationFn: (id: string) => leasesService.cancelLease(id),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ['leases'] })
+      queryClient.invalidateQueries({ queryKey: ['leases', id] })
+      queryClient.invalidateQueries({ queryKey: ['leases', id, 'payments'] })
       queryClient.invalidateQueries({ queryKey: ['units'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard'] })
       toast.success('Contrato cancelado com sucesso!')

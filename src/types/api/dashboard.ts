@@ -10,34 +10,56 @@ export interface OccupancyMetrics {
 }
 
 export interface FinancialMetrics {
-  monthly_revenue: string // decimal as string
-  total_receivable: string
-  total_received: string
-  total_pending: string
-  total_overdue: string
-  pending_count: number
-  overdue_count: number
+  monthly_projected_revenue: string // decimal as string
+  monthly_realized_revenue: string
+  overdue_amount: string
+  total_pending_amount: string
+  default_rate: number
+  collection_rate: number
 }
 
 export interface ContractMetrics {
-  total_active_leases: number
-  expiring_soon_count: number
-  expired_count: number
+  total_active_contracts: number
+  contracts_expiring_soon: number
+  expired_contracts: number
+  cancelled_contracts: number
 }
 
-export interface Alert {
-  type: 'contract_expiring' | 'payment_overdue' | 'unit_maintenance'
-  severity: 'high' | 'medium' | 'low'
-  message: string
-  entity_id: string
-  entity_type: 'lease' | 'payment' | 'unit'
+export interface OverduePayment {
+  payment_id: string
+  unit_number: string
+  tenant_name: string
+  amount: string
+  days_overdue: number
+}
+
+export interface ExpiringLease {
+  lease_id: string
+  unit_number: string
+  tenant_name: string
+  end_date: string
+  days_until_expiry: number
+}
+
+export interface VacantUnit {
+  unit_id: string
+  unit_number: string
+  status: string
+  days_vacant: number
+}
+
+export interface Alerts {
+  overdue_payments: OverduePayment[]
+  expiring_leases: ExpiringLease[]
+  vacant_units: VacantUnit[]
+  total_alerts: number
 }
 
 export interface DashboardResponse {
   occupancy: OccupancyMetrics
   financial: FinancialMetrics
   contracts: ContractMetrics
-  alerts: Alert[]
+  alerts: Alerts
 }
 
 export interface FinancialReportRequest {

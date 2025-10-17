@@ -79,30 +79,30 @@ export default function DashboardPage() {
         <h2 className="mb-4 text-lg font-semibold">Financeiro</h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <StatsCard
-            title="Receita Mensal"
-            value={formatCurrency(financial.monthly_revenue)}
-            description="Receita esperada"
+            title="Receita Projetada"
+            value={formatCurrency(financial.monthly_projected_revenue)}
+            description="Receita mensal esperada"
             icon={DollarSign}
-            iconClassName="text-green-600"
+            iconClassName="text-blue-600"
           />
           <StatsCard
-            title="Total Recebido"
-            value={formatCurrency(financial.total_received)}
-            description="Pagamentos confirmados"
+            title="Receita Realizada"
+            value={formatCurrency(financial.monthly_realized_revenue)}
+            description={`Taxa de cobrança: ${financial.collection_rate}%`}
             icon={CheckCircle}
             iconClassName="text-green-600"
           />
           <StatsCard
             title="Pagamentos Pendentes"
-            value={formatCurrency(financial.total_pending)}
-            description={`${financial.pending_count || 0} pagamento(s)`}
+            value={formatCurrency(financial.total_pending_amount)}
+            description="Aguardando pagamento"
             icon={AlertTriangle}
             iconClassName="text-yellow-600"
           />
           <StatsCard
             title="Pagamentos Atrasados"
-            value={formatCurrency(financial.total_overdue)}
-            description={`${financial.overdue_count || 0} pagamento(s)`}
+            value={formatCurrency(financial.overdue_amount)}
+            description={`Taxa de inadimplência: ${financial.default_rate}%`}
             icon={AlertTriangle}
             iconClassName="text-red-600"
           />
@@ -112,27 +112,34 @@ export default function DashboardPage() {
       {/* Métricas de Contratos */}
       <div>
         <h2 className="mb-4 text-lg font-semibold">Contratos</h2>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-4">
           <StatsCard
             title="Contratos Ativos"
-            value={contracts.total_active_leases}
+            value={contracts.total_active_contracts}
             description="Contratos vigentes"
             icon={FileText}
             iconClassName="text-blue-600"
           />
           <StatsCard
             title="Expirando em Breve"
-            value={contracts.expiring_soon_count}
+            value={contracts.contracts_expiring_soon}
             description="Próximos 45 dias"
             icon={AlertTriangle}
             iconClassName="text-yellow-600"
           />
           <StatsCard
             title="Contratos Expirados"
-            value={contracts.expired_count}
+            value={contracts.expired_contracts}
             description="Aguardando renovação"
             icon={AlertTriangle}
             iconClassName="text-red-600"
+          />
+          <StatsCard
+            title="Contratos Cancelados"
+            value={contracts.cancelled_contracts}
+            description="Total cancelados"
+            icon={FileText}
+            iconClassName="text-gray-600"
           />
         </div>
       </div>

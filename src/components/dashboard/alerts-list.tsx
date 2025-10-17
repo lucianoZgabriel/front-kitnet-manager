@@ -9,6 +9,12 @@ interface AlertsListProps {
 }
 
 export function AlertsList({ alerts }: AlertsListProps) {
+  // Debug: log dos dados recebidos
+  console.log('AlertsList - Dados recebidos:', alerts)
+  if (alerts.overdue_payments.length > 0) {
+    console.log('AlertsList - Primeiro pagamento atrasado:', alerts.overdue_payments[0])
+  }
+
   const hasAlerts =
     alerts.overdue_payments.length > 0 ||
     alerts.expiring_leases.length > 0 ||
@@ -52,19 +58,20 @@ export function AlertsList({ alerts }: AlertsListProps) {
             <div>
               <h3 className="mb-2 text-sm font-semibold text-red-700">Pagamentos Atrasados</h3>
               <div className="space-y-2">
-                {alerts.overdue_payments.map((payment) => (
+                {alerts.overdue_payments.map((payment, index) => (
                   <div
-                    key={payment.payment_id}
+                    key={payment.payment_id || `overdue-${index}`}
                     className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50/50 p-3"
                   >
                     <DollarSign className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600" />
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium text-gray-900">
-                        Unidade {payment.unit_number} - {payment.tenant_name}
+                        Unidade {payment.unit_number || '?'} -{' '}
+                        {payment.tenant_name || 'Nome não disponível'}
                       </p>
                       <p className="mt-1 text-xs text-gray-600">
-                        Valor: {formatCurrency(payment.amount)} • {payment.days_overdue} dias de
-                        atraso
+                        Valor: {formatCurrency(payment.amount || 0)} • {payment.days_overdue || 0}{' '}
+                        dias de atraso
                       </p>
                     </div>
                     <Badge variant="destructive" className="text-xs">

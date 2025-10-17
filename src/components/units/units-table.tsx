@@ -132,12 +132,31 @@ export function UnitsTable({ units }: UnitsTableProps) {
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1">
                       <Button variant="ghost" size="sm" asChild>
-                        <Link href={`/units/${unit.id}`}>
+                        <Link
+                          href={`/units/${unit.id}`}
+                          onClick={() => {
+                            console.log('[UNITS TABLE] Eye icon clicked', {
+                              unitId: unit.id,
+                              href: `/units/${unit.id}`,
+                              timestamp: new Date().toISOString(),
+                            })
+                          }}
+                        >
                           <Eye className="h-4 w-4" />
                         </Link>
                       </Button>
                       <Button variant="ghost" size="sm" asChild>
-                        <Link href={`/units/${unit.id}`}>
+                        <Link
+                          href={`/units/${unit.id}`}
+                          onClick={() => {
+                            console.log('[UNITS TABLE] Edit icon clicked', {
+                              unitId: unit.id,
+                              href: `/units/${unit.id}`,
+                              timestamp: new Date().toISOString(),
+                              hasAuthStorage: !!localStorage.getItem('auth-storage'),
+                            })
+                          }}
+                        >
                           <Edit className="h-4 w-4" />
                         </Link>
                       </Button>

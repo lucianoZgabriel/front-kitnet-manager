@@ -94,6 +94,29 @@ export const leasesService = {
   },
 
   /**
+   * Get cancellable payments for a lease
+   * Returns payments with status 'pending' or 'overdue' that can be cancelled
+   * @param leaseId - Lease UUID
+   */
+  async getCancellablePayments(leaseId: string): Promise<Payment[]> {
+    const response = await api.get<ApiResponse<Payment[]>>(
+      `/leases/${leaseId}/cancellable-payments`
+    )
+    const apiResponse = response as unknown as ApiResponse<Payment[]>
+    return apiResponse.data || []
+  },
+
+  /**
+   * Cancel lease with selected payments
+   * Note: Allows user to select which payments to cancel
+   * @param id - Lease UUID
+   * @param paymentIds - Array of payment UUIDs to cancel
+   */
+  async cancelLeaseWithPayments(id: string, paymentIds: string[]): Promise<void> {
+    await api.post(`/leases/${id}/cancel-with-payments`, { payment_ids: paymentIds })
+  },
+
+  /**
    * Get payments for a lease
    * @param leaseId - Lease UUID
    */

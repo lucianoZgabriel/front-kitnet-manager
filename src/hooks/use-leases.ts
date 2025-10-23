@@ -141,3 +141,41 @@ export function useCancelLease() {
     },
   })
 }
+
+/**
+ * Hook para buscar pagamentos canceláveis de um contrato
+ * Retorna pagamentos com status 'pending' ou 'overdue'
+ */
+export function useCancellablePayments(leaseId: string) {
+  return useQuery<Payment[]>({
+    queryKey: ['leases', leaseId, 'cancellable-payments'],
+    queryFn: () => leasesService.getCancellablePayments(leaseId),
+    enabled: !!leaseId,
+    staleTime: 1 * 60 * 1000, // 1 minuto
+  })
+}
+
+/**
+ * Hook para cancelar contrato com seleção de pagamentos
+ * Nota: Permite escolher quais pagamentos serão cancelados
+ */
+export function useCancelLeaseWithPayments() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, paymentIds }: { id: string; paymentIds: string[] }) =>
+      leasesService.cancelLeaseWithPayments(id, paymentIds),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['leases'] })
+      queryClient.invalidateQueries({ queryKey: ['leases', id] })
+      queryClient.invalidateQueries({ queryKey: ['leases', id, 'payments'] })
+      queryClient.invalidateQueries({ queryKey: ['leases', id, 'cancellable-payments'] })
+      queryClient.invalidateQueries({ queryKey: ['units'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] })
+      toast.success('Contrato e pagamentos selecionados cancelados com sucesso!')
+    },
+    onError: (error: { message: string }) => {
+      toast.error(`Erro ao cancelar contrato: ${error.message}`)
+    },
+  })
+}

@@ -3,12 +3,18 @@
 import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useLease, useLeasePayments, useCancelLease, useRenewLease } from '@/src/hooks/use-leases'
+import {
+  useLease,
+  useLeasePayments,
+  useRenewLease,
+  useCancellablePayments,
+  useCancelLeaseWithPayments,
+} from '@/src/hooks/use-leases'
 import { useTenant } from '@/src/hooks/use-tenants'
 import { useUnit } from '@/src/hooks/use-units'
 import { LoadingSpinner } from '@/src/components/shared/loading-spinner'
 import { ErrorMessage } from '@/src/components/shared/error-message'
-import { ConfirmDialog } from '@/src/components/shared/confirm-dialog'
+import { CancelLeaseDialog } from '@/src/components/leases/cancel-lease-dialog'
 import { Button } from '@/src/components/ui/button'
 import { Input } from '@/src/components/ui/input'
 import { Label } from '@/src/components/ui/label'
@@ -41,7 +47,9 @@ export default function LeaseDetailsPage() {
   const { data: lease, isLoading, error, refetch } = useLease(id)
   // Reabilitado com retry automático para lidar com 401 temporário do backend
   const { data: payments, isLoading: paymentsLoading } = useLeasePayments(id)
-  const cancelLease = useCancelLease()
+  const { data: cancellablePayments = [], isLoading: cancellablePaymentsLoading } =
+    useCancellablePayments(id)
+  const cancelLeaseWithPayments = useCancelLeaseWithPayments()
   const renewLease = useRenewLease()
 
   // Buscar dados relacionados (só busca quando lease está carregado e IDs são válidos)
@@ -75,9 +83,9 @@ export default function LeaseDetailsPage() {
     )
   }
 
-  const handleCancel = async () => {
+  const handleCancelWithPayments = async (paymentIds: string[]) => {
     try {
-      await cancelLease.mutateAsync(id)
+      await cancelLeaseWithPayments.mutateAsync({ id, paymentIds })
       setShowCancelDialog(false)
       router.push('/leases')
     } catch {
@@ -419,15 +427,12 @@ export default function LeaseDetailsPage() {
       </Card>
 
       {/* Dialog de Cancelamento */}
-      <ConfirmDialog
+      <CancelLeaseDialog
         open={showCancelDialog}
         onOpenChange={setShowCancelDialog}
-        title="Cancelar Contrato"
-        description="Tem certeza que deseja cancelar este contrato? Esta ação vai liberar a unidade e cancelar todos os pagamentos pendentes."
-        confirmText="Sim, cancelar"
-        onConfirm={handleCancel}
-        variant="destructive"
-        loading={cancelLease.isPending}
+        payments={cancellablePayments}
+        onConfirm={handleCancelWithPayments}
+        loading={cancelLeaseWithPayments.isPending || cancellablePaymentsLoading}
       />
 
       {/* Dialog de Renovação */}

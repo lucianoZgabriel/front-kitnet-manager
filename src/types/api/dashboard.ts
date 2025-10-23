@@ -25,6 +25,25 @@ export interface ContractMetrics {
   cancelled_contracts: number
 }
 
+// Estrutura real retornada pela API (confirmado via logs)
+export interface Alert {
+  type: 'overdue_payment' | 'expiring_lease' | 'vacant_unit'
+  severity: 'low' | 'medium' | 'high'
+  title: string
+  description: string
+  entity_id: string
+  created_at: string
+}
+
+export interface Alerts {
+  overdue_payments: Alert[]
+  expiring_leases: Alert[]
+  vacant_units: Alert[]
+  total_alerts: number
+}
+
+// Tipos legados - mantidos para compatibilidade mas não são usados pela API atual
+/** @deprecated Use Alert instead - API retorna estrutura diferente */
 export interface OverduePayment {
   payment_id: string
   unit_number: string
@@ -33,6 +52,7 @@ export interface OverduePayment {
   days_overdue: number
 }
 
+/** @deprecated Use Alert instead - API retorna estrutura diferente */
 export interface ExpiringLease {
   lease_id: string
   unit_number: string
@@ -41,18 +61,12 @@ export interface ExpiringLease {
   days_until_expiry: number
 }
 
+/** @deprecated Use Alert instead - API retorna estrutura diferente */
 export interface VacantUnit {
   unit_id: string
   unit_number: string
   status: string
   days_vacant: number
-}
-
-export interface Alerts {
-  overdue_payments: OverduePayment[]
-  expiring_leases: ExpiringLease[]
-  vacant_units: VacantUnit[]
-  total_alerts: number
 }
 
 export interface DashboardResponse {

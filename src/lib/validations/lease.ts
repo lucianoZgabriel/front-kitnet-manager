@@ -55,23 +55,9 @@ export const leaseFormSchema = z
 
 /**
  * Schema para renovação de contrato
+ * NOTA: Taxa de pintura NÃO é cobrada em renovações, apenas no primeiro contrato
  */
 export const renewLeaseFormSchema = z.object({
-  painting_fee_total: z
-    .string()
-    .min(1, 'Taxa de pintura é obrigatória')
-    .refine(
-      (val) => {
-        const num = parseFloat(val)
-        return !isNaN(num) && num >= 0
-      },
-      { message: 'Taxa de pintura deve ser maior ou igual a zero' }
-    ),
-  painting_fee_installments: z
-    .number()
-    .int('Parcelas devem ser um número inteiro')
-    .min(1, 'Parcelas devem ser entre 1 e 4')
-    .max(4, 'Parcelas devem ser entre 1 e 4'),
   new_rent_value: z
     .string()
     .optional()

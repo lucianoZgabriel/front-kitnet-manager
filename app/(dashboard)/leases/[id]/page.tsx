@@ -21,13 +21,6 @@ import { LeaseRentAdjustmentHistory } from '@/src/components/leases/lease-rent-a
 import { Button } from '@/src/components/ui/button'
 import { Input } from '@/src/components/ui/input'
 import { Label } from '@/src/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/src/components/ui/select'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/components/ui/card'
 import {
   Dialog,
@@ -68,8 +61,6 @@ export default function LeaseDetailsPage() {
   const [showCancelDialog, setShowCancelDialog] = useState(false)
   const [showRenewDialog, setShowRenewDialog] = useState(false)
   const [showChangeDueDayDialog, setShowChangeDueDayDialog] = useState(false)
-  const [renewPaintingFee, setRenewPaintingFee] = useState('250.00')
-  const [renewInstallments, setRenewInstallments] = useState(2)
   const [newRentValue, setNewRentValue] = useState('')
   const [adjustmentReason, setAdjustmentReason] = useState('')
 
@@ -106,8 +97,9 @@ export default function LeaseDetailsPage() {
       await renewLease.mutateAsync({
         id,
         data: {
-          painting_fee_total: renewPaintingFee,
-          painting_fee_installments: renewInstallments,
+          // Taxa de pintura é zero em renovações (paga apenas no primeiro contrato)
+          painting_fee_total: '0',
+          painting_fee_installments: 0,
           new_rent_value: newRentValue || undefined,
           adjustment_reason: adjustmentReason || undefined,
         },
@@ -485,6 +477,15 @@ export default function LeaseDetailsPage() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
+            {/* Informação sobre Taxa de Pintura */}
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+              <h4 className="mb-2 text-sm font-semibold text-blue-900">ℹ️ Taxa de Pintura</h4>
+              <p className="text-xs text-blue-800">
+                A taxa de pintura é paga apenas no primeiro contrato. Renovações não incluem
+                cobrança de taxa de pintura.
+              </p>
+            </div>
+
             {/* Alerta de Reajuste Anual */}
             {lease.should_apply_adjustment && (
               <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
@@ -497,38 +498,6 @@ export default function LeaseDetailsPage() {
                 </p>
               </div>
             )}
-
-            <div className="space-y-2">
-              <Label htmlFor="renew_painting_fee">Taxa de Pintura</Label>
-              <Input
-                id="renew_painting_fee"
-                type="text"
-                placeholder="250.00"
-                value={renewPaintingFee}
-                onChange={(e) => setRenewPaintingFee(e.target.value)}
-              />
-              <p className="text-muted-foreground text-xs">
-                Formato: 1000.00 (ponto como separador decimal)
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="renew_installments">Número de Parcelas</Label>
-              <Select
-                value={renewInstallments.toString()}
-                onValueChange={(val) => setRenewInstallments(parseInt(val))}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">1x</SelectItem>
-                  <SelectItem value="2">2x</SelectItem>
-                  <SelectItem value="3">3x</SelectItem>
-                  <SelectItem value="4">4x</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
 
             {/* Campos de Reajuste (opcionais) */}
             <div className="space-y-4 rounded-lg border p-4">

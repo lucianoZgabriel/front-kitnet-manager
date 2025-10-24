@@ -16,15 +16,7 @@ import { Textarea } from '@/src/components/ui/textarea'
 import { Badge } from '@/src/components/ui/badge'
 import { LoadingSpinner } from '@/src/components/shared/loading-spinner'
 import { formatCurrency, formatDate } from '@/src/lib/utils/format'
-import {
-  Calendar,
-  AlertCircle,
-  CheckCircle2,
-  ArrowRight,
-  Info,
-  DollarSign,
-  Clock,
-} from 'lucide-react'
+import { Calendar, CheckCircle2, ArrowRight, Info, DollarSign, Clock } from 'lucide-react'
 import type { Lease } from '@/src/types/api/lease'
 import type { ChangePaymentDueDayResponse } from '@/src/types/api/lease'
 

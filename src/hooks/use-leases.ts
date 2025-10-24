@@ -7,6 +7,7 @@ import type {
   LeaseStats,
   ChangePaymentDueDayRequest,
   ChangePaymentDueDayResponse,
+  LeaseRentAdjustment,
 } from '@/src/types/api/lease'
 import type { Payment } from '@/src/types/api/payment'
 import { toast } from 'sonner'
@@ -205,5 +206,17 @@ export function useChangePaymentDueDay() {
     onError: (error: { message: string }) => {
       toast.error(`Erro ao alterar dia de vencimento: ${error.message}`)
     },
+  })
+}
+
+/**
+ * Hook para buscar histórico de reajustes de aluguel de um contrato
+ */
+export function useLeaseRentAdjustments(leaseId: string) {
+  return useQuery<LeaseRentAdjustment[]>({
+    queryKey: ['leases', leaseId, 'rent-adjustments'],
+    queryFn: () => leasesService.getLeaseRentAdjustments(leaseId),
+    enabled: !!leaseId,
+    staleTime: 5 * 60 * 1000, // 5 minutos
   })
 }

@@ -46,3 +46,37 @@ export interface LeaseStats {
   expired: number
   cancelled: number
 }
+
+// Change Payment Due Day Types
+
+export interface ChangePaymentDueDayRequest {
+  new_payment_due_day: number // 1-31
+  effective_date: string // ISO date (YYYY-MM-DD)
+  reason?: string
+}
+
+export interface ProportionalPaymentInfo {
+  id: string
+  reference_period: string // "DD/MM/YYYY - DD/MM/YYYY"
+  days: number
+  amount: number
+  due_date: string // ISO date
+  status: string
+}
+
+export interface UpdatedPaymentInfo {
+  id: string
+  reference_month: string // ISO date
+  old_due_date: string // ISO date
+  new_due_date: string // ISO date
+}
+
+export interface ChangePaymentDueDayResponse {
+  lease_id: string
+  old_payment_due_day: number
+  new_payment_due_day: number
+  effective_date: string // ISO date
+  proportional_payment?: ProportionalPaymentInfo
+  updated_payments_count: number
+  updated_payments: UpdatedPaymentInfo[]
+}

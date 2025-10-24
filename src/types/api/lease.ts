@@ -15,6 +15,10 @@ export interface Lease {
   painting_fee_installments: number // 1-4
   painting_fee_paid: string // decimal as string
   status: LeaseStatus
+  parent_lease_id?: string // ID do contrato anterior (null = contrato original)
+  generation: number // Geração do contrato (1=original, 2=1ª renovação, etc)
+  total_months: number // Total de meses de locação (generation * 6)
+  should_apply_adjustment: boolean // Se deve aplicar reajuste anual
   created_at: string
   updated_at: string
 }
@@ -33,6 +37,8 @@ export interface CreateLeaseRequest {
 export interface RenewLeaseRequest {
   painting_fee_total: string
   painting_fee_installments: number // 1-4
+  new_rent_value?: string // Novo valor de aluguel (opcional, para reajuste)
+  adjustment_reason?: string // Motivo do reajuste (opcional)
 }
 
 export interface UpdatePaintingFeePaidRequest {
@@ -79,4 +85,18 @@ export interface ChangePaymentDueDayResponse {
   proportional_payment?: ProportionalPaymentInfo
   updated_payments_count: number
   updated_payments: UpdatedPaymentInfo[]
+}
+
+// Annual Rent Adjustment Types
+
+export interface LeaseRentAdjustment {
+  id: string
+  lease_id: string
+  previous_rent_value: number
+  new_rent_value: number
+  adjustment_percentage: number // Percentual de reajuste
+  applied_at: string // ISO datetime
+  reason?: string // Motivo do reajuste
+  applied_by?: string // UUID do usuário que aplicou
+  created_at: string // ISO datetime
 }

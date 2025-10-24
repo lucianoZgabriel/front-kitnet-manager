@@ -72,6 +72,18 @@ export const renewLeaseFormSchema = z.object({
     .int('Parcelas devem ser um número inteiro')
     .min(1, 'Parcelas devem ser entre 1 e 4')
     .max(4, 'Parcelas devem ser entre 1 e 4'),
+  new_rent_value: z
+    .string()
+    .optional()
+    .refine(
+      (val) => {
+        if (!val || val === '') return true // Optional
+        const num = parseFloat(val)
+        return !isNaN(num) && num > 0
+      },
+      { message: 'Novo valor do aluguel deve ser maior que zero' }
+    ),
+  adjustment_reason: z.string().optional(),
 })
 
 export type LeaseFormData = z.infer<typeof leaseFormSchema>

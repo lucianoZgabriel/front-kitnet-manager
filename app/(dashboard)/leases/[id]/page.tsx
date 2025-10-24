@@ -17,6 +17,7 @@ import { LoadingSpinner } from '@/src/components/shared/loading-spinner'
 import { ErrorMessage } from '@/src/components/shared/error-message'
 import { CancelLeaseDialog } from '@/src/components/leases/cancel-lease-dialog'
 import { ChangePaymentDueDayDialog } from '@/src/components/leases/change-payment-due-day-dialog'
+import { LeaseRentAdjustmentHistory } from '@/src/components/leases/lease-rent-adjustment-history'
 import { Button } from '@/src/components/ui/button'
 import { Input } from '@/src/components/ui/input'
 import { Label } from '@/src/components/ui/label'
@@ -69,6 +70,8 @@ export default function LeaseDetailsPage() {
   const [showChangeDueDayDialog, setShowChangeDueDayDialog] = useState(false)
   const [renewPaintingFee, setRenewPaintingFee] = useState('250.00')
   const [renewInstallments, setRenewInstallments] = useState(2)
+  const [newRentValue, setNewRentValue] = useState('')
+  const [adjustmentReason, setAdjustmentReason] = useState('')
 
   if (isLoading) {
     return (
@@ -105,9 +108,14 @@ export default function LeaseDetailsPage() {
         data: {
           painting_fee_total: renewPaintingFee,
           painting_fee_installments: renewInstallments,
+          new_rent_value: newRentValue || undefined,
+          adjustment_reason: adjustmentReason || undefined,
         },
       })
       setShowRenewDialog(false)
+      // Limpar campos após sucesso
+      setNewRentValue('')
+      setAdjustmentReason('')
     } catch {
       // Erro já tratado pelo hook
     }
@@ -454,6 +462,9 @@ export default function LeaseDetailsPage() {
         </CardContent>
       </Card>
 
+      {/* Histórico de Reajustes */}
+      <LeaseRentAdjustmentHistory leaseId={id} />
+
       {/* Dialog de Cancelamento */}
       <CancelLeaseDialog
         open={showCancelDialog}
@@ -465,7 +476,7 @@ export default function LeaseDetailsPage() {
 
       {/* Dialog de Renovação */}
       <Dialog open={showRenewDialog} onOpenChange={setShowRenewDialog}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Renovar Contrato</DialogTitle>
             <DialogDescription>
@@ -474,6 +485,19 @@ export default function LeaseDetailsPage() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
+            {/* Alerta de Reajuste Anual */}
+            {lease.should_apply_adjustment && (
+              <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+                <h4 className="mb-2 text-sm font-semibold text-yellow-900">
+                  ⚠️ Reajuste Anual Disponível
+                </h4>
+                <p className="text-xs text-yellow-800">
+                  Este contrato completou 12 meses de locação ({lease.total_months} meses total).
+                  Você pode aplicar um reajuste de valor nesta renovação.
+                </p>
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="renew_painting_fee">Taxa de Pintura</Label>
               <Input
@@ -487,6 +511,7 @@ export default function LeaseDetailsPage() {
                 Formato: 1000.00 (ponto como separador decimal)
               </p>
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="renew_installments">Número de Parcelas</Label>
               <Select
@@ -503,6 +528,40 @@ export default function LeaseDetailsPage() {
                   <SelectItem value="4">4x</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* Campos de Reajuste (opcionais) */}
+            <div className="space-y-4 rounded-lg border p-4">
+              <h4 className="text-sm font-semibold">Reajuste de Valor (Opcional)</h4>
+
+              <div className="space-y-2">
+                <Label htmlFor="new_rent_value">Novo Valor do Aluguel</Label>
+                <Input
+                  id="new_rent_value"
+                  type="text"
+                  placeholder={lease.monthly_rent_value}
+                  value={newRentValue}
+                  onChange={(e) => setNewRentValue(e.target.value)}
+                />
+                <p className="text-muted-foreground text-xs">
+                  Valor atual: {formatCurrency(parseFloat(lease.monthly_rent_value))}. Deixe em
+                  branco para manter o valor atual.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="adjustment_reason">Motivo do Reajuste</Label>
+                <Input
+                  id="adjustment_reason"
+                  type="text"
+                  placeholder="Ex: Reajuste anual IGPM 2024"
+                  value={adjustmentReason}
+                  onChange={(e) => setAdjustmentReason(e.target.value)}
+                />
+                <p className="text-muted-foreground text-xs">
+                  Opcional. Ex: Reajuste anual IGPM, Inflação IPCA, etc.
+                </p>
+              </div>
             </div>
           </div>
           <DialogFooter>

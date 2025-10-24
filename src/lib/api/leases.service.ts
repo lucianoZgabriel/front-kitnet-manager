@@ -7,6 +7,7 @@ import type {
   LeaseStats,
   ChangePaymentDueDayRequest,
   ChangePaymentDueDayResponse,
+  LeaseRentAdjustment,
 } from '@/src/types/api/lease'
 import type { Payment } from '@/src/types/api/payment'
 
@@ -144,5 +145,17 @@ export const leasesService = {
     )
     const apiResponse = response as unknown as ApiResponse<ChangePaymentDueDayResponse>
     return apiResponse.data as ChangePaymentDueDayResponse
+  },
+
+  /**
+   * Get rent adjustment history for a lease
+   * @param id - Lease UUID
+   */
+  async getLeaseRentAdjustments(id: string): Promise<LeaseRentAdjustment[]> {
+    const response = await api.get<ApiResponse<LeaseRentAdjustment[]>>(
+      `/leases/${id}/rent-adjustments`
+    )
+    const apiResponse = response as unknown as ApiResponse<LeaseRentAdjustment[]>
+    return apiResponse.data || []
   },
 }

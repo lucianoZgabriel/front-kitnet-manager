@@ -5,6 +5,8 @@ import type {
   CreateLeaseRequest,
   RenewLeaseRequest,
   LeaseStats,
+  ChangePaymentDueDayRequest,
+  ChangePaymentDueDayResponse,
 } from '@/src/types/api/lease'
 import type { Payment } from '@/src/types/api/payment'
 
@@ -124,5 +126,23 @@ export const leasesService = {
     const response = await api.get<ApiResponse<Payment[]>>(`/leases/${leaseId}/payments`)
     const apiResponse = response as unknown as ApiResponse<Payment[]>
     return apiResponse.data || []
+  },
+
+  /**
+   * Change payment due day for a lease
+   * Note: Calculates proportional payment and updates all future pending/overdue payments
+   * @param id - Lease UUID
+   * @param data - Change payment due day data
+   */
+  async changePaymentDueDay(
+    id: string,
+    data: ChangePaymentDueDayRequest
+  ): Promise<ChangePaymentDueDayResponse> {
+    const response = await api.post<ApiResponse<ChangePaymentDueDayResponse>>(
+      `/leases/${id}/change-payment-due-day`,
+      data
+    )
+    const apiResponse = response as unknown as ApiResponse<ChangePaymentDueDayResponse>
+    return apiResponse.data as ChangePaymentDueDayResponse
   },
 }

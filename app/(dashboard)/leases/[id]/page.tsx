@@ -9,12 +9,14 @@ import {
   useRenewLease,
   useCancellablePayments,
   useCancelLeaseWithPayments,
+  useChangePaymentDueDay,
 } from '@/src/hooks/use-leases'
 import { useTenant } from '@/src/hooks/use-tenants'
 import { useUnit } from '@/src/hooks/use-units'
 import { LoadingSpinner } from '@/src/components/shared/loading-spinner'
 import { ErrorMessage } from '@/src/components/shared/error-message'
 import { CancelLeaseDialog } from '@/src/components/leases/cancel-lease-dialog'
+import { ChangePaymentDueDayDialog } from '@/src/components/leases/change-payment-due-day-dialog'
 import { Button } from '@/src/components/ui/button'
 import { Input } from '@/src/components/ui/input'
 import { Label } from '@/src/components/ui/label'
@@ -35,9 +37,10 @@ import {
   DialogTitle,
 } from '@/src/components/ui/dialog'
 import { Badge } from '@/src/components/ui/badge'
-import { ArrowLeft, RefreshCw, XCircle } from 'lucide-react'
+import { ArrowLeft, RefreshCw, XCircle, Calendar } from 'lucide-react'
 import { LeaseStatusBadge } from '@/src/components/leases/lease-status-badge'
 import { formatCurrency, formatDate, formatDateTime, formatCPF } from '@/src/lib/utils/format'
+import type { ChangePaymentDueDayResponse } from '@/src/types/api/lease'
 
 export default function LeaseDetailsPage() {
   const params = useParams()
@@ -51,6 +54,7 @@ export default function LeaseDetailsPage() {
     useCancellablePayments(id)
   const cancelLeaseWithPayments = useCancelLeaseWithPayments()
   const renewLease = useRenewLease()
+  const changePaymentDueDay = useChangePaymentDueDay()
 
   // Buscar dados relacionados (só busca quando lease está carregado e IDs são válidos)
   const {
@@ -62,6 +66,7 @@ export default function LeaseDetailsPage() {
 
   const [showCancelDialog, setShowCancelDialog] = useState(false)
   const [showRenewDialog, setShowRenewDialog] = useState(false)
+  const [showChangeDueDayDialog, setShowChangeDueDayDialog] = useState(false)
   const [renewPaintingFee, setRenewPaintingFee] = useState('250.00')
   const [renewInstallments, setRenewInstallments] = useState(2)
 
@@ -108,8 +113,25 @@ export default function LeaseDetailsPage() {
     }
   }
 
+  const handleChangePaymentDueDay = async (data: {
+    newPaymentDueDay: number
+    effectiveDate: string
+    reason?: string
+  }): Promise<ChangePaymentDueDayResponse> => {
+    const response = await changePaymentDueDay.mutateAsync({
+      id,
+      data: {
+        new_payment_due_day: data.newPaymentDueDay,
+        effective_date: data.effectiveDate,
+        reason: data.reason,
+      },
+    })
+    return response
+  }
+
   const canCancel = lease.status === 'active' || lease.status === 'expiring_soon'
   const canRenew = lease.status === 'active' || lease.status === 'expiring_soon'
+  const canChangeDueDay = lease.status === 'active' || lease.status === 'expiring_soon'
 
   // Calcular estatísticas de pagamento
   const totalPayments = payments?.length || 0
@@ -137,6 +159,12 @@ export default function LeaseDetailsPage() {
               <Button variant="outline" onClick={() => setShowRenewDialog(true)}>
                 <RefreshCw className="mr-2 h-4 w-4" />
                 Renovar
+              </Button>
+            )}
+            {canChangeDueDay && (
+              <Button variant="outline" onClick={() => setShowChangeDueDayDialog(true)}>
+                <Calendar className="mr-2 h-4 w-4" />
+                Alterar Vencimento
               </Button>
             )}
             {canCancel && (
@@ -498,6 +526,15 @@ export default function LeaseDetailsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Dialog de Alteração de Vencimento */}
+      <ChangePaymentDueDayDialog
+        open={showChangeDueDayDialog}
+        onOpenChange={setShowChangeDueDayDialog}
+        lease={lease}
+        onConfirm={handleChangePaymentDueDay}
+        loading={changePaymentDueDay.isPending}
+      />
     </div>
   )
 }

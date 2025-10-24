@@ -5,6 +5,8 @@ import type {
   CreateLeaseRequest,
   RenewLeaseRequest,
   LeaseStats,
+  ChangePaymentDueDayRequest,
+  ChangePaymentDueDayResponse,
 } from '@/src/types/api/lease'
 import type { Payment } from '@/src/types/api/payment'
 import { toast } from 'sonner'
@@ -176,6 +178,32 @@ export function useCancelLeaseWithPayments() {
     },
     onError: (error: { message: string }) => {
       toast.error(`Erro ao cancelar contrato: ${error.message}`)
+    },
+  })
+}
+
+/**
+ * Hook para alterar dia de vencimento de pagamentos de um contrato
+ * Nota: Gera pagamento proporcional e recalcula pagamentos futuros
+ */
+export function useChangePaymentDueDay() {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    ChangePaymentDueDayResponse,
+    { message: string },
+    { id: string; data: ChangePaymentDueDayRequest }
+  >({
+    mutationFn: ({ id, data }) => leasesService.changePaymentDueDay(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['leases'] })
+      queryClient.invalidateQueries({ queryKey: ['leases', id] })
+      queryClient.invalidateQueries({ queryKey: ['leases', id, 'payments'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] })
+      toast.success('Dia de vencimento alterado com sucesso!')
+    },
+    onError: (error: { message: string }) => {
+      toast.error(`Erro ao alterar dia de vencimento: ${error.message}`)
     },
   })
 }

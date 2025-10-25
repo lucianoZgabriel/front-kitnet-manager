@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useAuth } from '@/src/hooks/use-auth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/components/ui/card'
 import { Button } from '@/src/components/ui/button'
-import { User, Users, ChevronRight } from 'lucide-react'
+import { User, Users, Settings2, ChevronRight } from 'lucide-react'
 
 export default function SettingsPage() {
   const { user } = useAuth()
@@ -22,6 +22,13 @@ export default function SettingsPage() {
       description: 'Crie, edite e gerencie usuários do sistema (apenas administradores)',
       icon: Users,
       href: '/settings/users',
+      roles: ['admin'],
+    },
+    {
+      title: 'Funções Técnicas',
+      description: 'Execute tarefas administrativas e testes do sistema',
+      icon: Settings2,
+      href: '/settings/technical',
       roles: ['admin'],
     },
   ]

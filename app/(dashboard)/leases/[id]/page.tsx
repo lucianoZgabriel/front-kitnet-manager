@@ -98,8 +98,9 @@ export default function LeaseDetailsPage() {
         id,
         data: {
           // Taxa de pintura é zero em renovações (paga apenas no primeiro contrato)
+          // installments=1 necessário para constraint do banco, mas como valor=0 não gera pagamentos
           painting_fee_total: '0',
-          painting_fee_installments: 0,
+          painting_fee_installments: 1,
           new_rent_value: newRentValue || undefined,
           adjustment_reason: adjustmentReason || undefined,
         },
